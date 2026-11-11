@@ -12,35 +12,21 @@
     <link rel="apple-touch-icon" href="icon.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { darkMode: 'class' }
-    </script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
     <style>
         :root {
-            --accent-color: #10b981;
-            --page-bg: #000000;
-            --page-fg: #f1f5f9;
-            --panel-bg: #18181b;
-            --inp-bg: #09090b;
-            --bar-bg: rgba(0, 0, 0, 0.95);
-            --nav-bg: #09090b;
-            --bar-border: #27272a;
-            --muted: #a1a1aa;
+            --accent-color: #10b981; --page-bg: #000000; --page-fg: #f1f5f9; --panel-bg: #18181b;
+            --inp-bg: #09090b; --bar-bg: rgba(0,0,0,.95); --nav-bg: #09090b; --bar-border: #27272a; --muted: #a1a1aa;
         }
-        [data-theme="dark"] {
-            --page-bg: #0f172a; --panel-bg: #1e293b; --inp-bg: #0b1220;
-            --bar-bg: rgba(15, 23, 42, 0.95); --nav-bg: #020617; --bar-border: #334155; --muted: #94a3b8;
-        }
-        [data-theme="light"] {
-            --page-bg: #f1f5f9; --page-fg: #1e293b; --panel-bg: #ffffff; --inp-bg: #f8fafc;
-            --bar-bg: rgba(255, 255, 255, 0.95); --nav-bg: #e2e8f0; --bar-border: #cbd5e1; --muted: #64748b;
-        }
+        [data-theme="dark"] { --page-bg: #0f172a; --panel-bg: #1e293b; --inp-bg: #0b1220; --bar-bg: rgba(15,23,42,.95); --nav-bg: #020617; --bar-border: #334155; --muted: #94a3b8; }
+        [data-theme="light"] { --page-bg: #f1f5f9; --page-fg: #1e293b; --panel-bg: #ffffff; --inp-bg: #f8fafc; --bar-bg: rgba(255,255,255,.95); --nav-bg: #e2e8f0; --bar-border: #cbd5e1; --muted: #64748b; }
         body { background-color: var(--page-bg); color: var(--page-fg); -webkit-tap-highlight-color: transparent; }
         .app-header { background-color: var(--bar-bg); border-color: var(--bar-border); }
         .accent-text { color: var(--accent-color) !important; }
         .accent-bg { background-color: var(--accent-color) !important; }
         .card { background: var(--panel-bg); border: 1px solid var(--bar-border); border-radius: 1.25rem; }
         .inp { width: 100%; background: var(--inp-bg); border: 1px solid var(--bar-border); color: var(--page-fg); border-radius: .75rem; padding: .6rem .75rem; font-size: .85rem; outline: none; }
+        textarea.inp { resize: vertical; }
         .inp:focus { border-color: var(--accent-color); }
         .btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; border-radius: .75rem; padding: .55rem .9rem; font-size: .8rem; font-weight: 600; border: 1px solid var(--bar-border); background: var(--panel-bg); color: var(--page-fg); transition: transform .08s; }
         .btn:active { transform: scale(.96); }
@@ -52,63 +38,46 @@
         .chip.on { background: var(--accent-color); border-color: var(--accent-color); color: #fff; }
         .ic { flex: none; display: inline-block; vertical-align: middle; }
         .chev { transition: transform .2s; display: inline-flex; }
-        .rot { transform: rotate(180deg); }
         .bb { border-color: var(--bar-border); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         input[type=checkbox], input[type=radio] { accent-color: var(--accent-color); }
-        .navbtn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: .55rem 0; font-size: 10px; font-weight: 600; color: var(--muted); }
-        .navbtn.on { color: var(--accent-color); }
         .timer-disp { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 4.5rem; font-weight: 800; line-height: 1; letter-spacing: -.02em; }
-        .qtext { font-size: 1.5rem; line-height: 1.35; font-weight: 700; }
         @keyframes pulse2 { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
         .flash { animation: pulse2 .5s 6; }
-        .stu { display: none; }
-        #testView.sv .stu { display: inline-flex; }
-        #testView.sv .exm { display: none !important; }
-        #testView.sv .qtext { font-size: 2.1rem; }
+        .chk { display: flex; align-items: center; gap: .75rem; text-align: left; width: 100%; padding: .8rem .9rem; background: var(--panel-bg); border: 1px solid var(--bar-border); border-radius: 1rem; }
+        .cb { flex: none; width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--bar-border); display: inline-flex; align-items: center; justify-content: center; color: #fff; }
+        .chk .cb svg { opacity: 0; }
+        .chk.done { opacity: .6; }
+        .chk.done .qt { text-decoration: line-through; }
+        .chk.done .cb { background: var(--accent-color); border-color: var(--accent-color); }
+        .chk.done .cb svg { opacity: 1; }
+        .rec-dot { width: 10px; height: 10px; border-radius: 50%; background: #ef4444; display: inline-block; animation: pulse2 1s infinite; }
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
     </style>
 </head>
-<body id="appBody" class="min-h-screen flex flex-col font-sans transition-colors duration-200 select-none pb-24">
+<body id="appBody" class="min-h-screen flex flex-col font-sans transition-colors duration-200 select-none pb-8">
 
-    <!-- TOP HEADER -->
-    <header id="appHeader" class="app-header sticky top-0 z-30 backdrop-blur-md border-b px-4 py-3 flex items-center justify-between">
+    <header id="appHeader" class="app-header sticky top-0 z-30 backdrop-blur-md border-b px-4 py-3 flex items-center justify-between" style="padding-top:calc(.75rem + env(safe-area-inset-top))">
         <div class="flex items-center space-x-3">
             <img src="small-icon.png" data-emb="sm" alt="Logo" class="w-9 h-9 rounded-full object-cover border shadow-sm bb" />
             <div>
-                <h1 id="appTitleHeader" class="text-base font-bold tracking-tight leading-none accent-text">IST ASSIST</h1>
+                <h1 class="text-base font-bold tracking-tight leading-none accent-text">IST ASSIST</h1>
                 <p class="text-[10px] muted font-medium">IELTS Speaking Test Assistant</p>
             </div>
         </div>
-        <div class="flex items-center space-x-2">
-            <button data-act="lockApp" aria-label="Lock app" class="p-2.5 rounded-xl hover:opacity-70 transition"><span data-i="lock" data-s="22"></span></button>
-            <button id="openSettingsBtn" data-act="settings" aria-label="Open settings" class="p-2.5 rounded-xl hover:opacity-70 transition"><span data-i="gear" data-s="22"></span></button>
-        </div>
+        <button data-act="settings" aria-label="Open settings" class="p-2.5 rounded-xl hover:opacity-70 transition"><span data-i="gear" data-s="22"></span></button>
     </header>
 
     <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 z-[80] hidden px-4 py-2 rounded-xl text-xs font-medium shadow-xl border max-w-[90vw] text-center bb" style="background:var(--panel-bg);color:var(--page-fg)"></div>
 
-    <main id="view" class="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 space-y-4"></main>
+    <main id="view" class="flex-1 max-w-3xl w-full mx-auto p-4 sm:p-6 space-y-4"></main>
 
     <footer class="py-4 text-center">
         <p class="text-[10px] font-mono tracking-widest muted uppercase">Made by REAPER-357</p>
     </footer>
 
-    <!-- BOTTOM NAV -->
-    <nav class="fixed bottom-0 inset-x-0 z-30 flex border-t" style="background:var(--nav-bg);border-color:var(--bar-border);padding-bottom:env(safe-area-inset-bottom)">
-        <button class="navbtn" id="navClasses" data-act="tab" data-v="classes"><span data-i="users" data-s="22"></span>Classes</button>
-        <button class="navbtn" id="navResults" data-act="tab" data-v="results"><span data-i="chart" data-s="22"></span>Results</button>
-    </nav>
-
-    <!-- SHEET (settings, forms, question bank) -->
     <div id="sheet" class="fixed inset-0 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4" style="background:rgba(0,0,0,.75)"></div>
-
-    <!-- TEST VIEW -->
     <div id="testView" class="fixed inset-0 z-[55] hidden flex flex-col" style="background:var(--page-bg)"></div>
-
-    <!-- LANDING (role select) & PIN PROMPT -->
-    <div id="landing" class="fixed inset-0 z-[70] flex items-center justify-center p-6 overflow-y-auto" style="background:var(--page-bg)"></div>
-    <div id="pinBox" class="fixed inset-0 z-[90] hidden flex items-center justify-center p-6" style="background:rgba(0,0,0,.8)"></div>
 
 <script>
 /* ============================== ICONS (inline SVG, no network) ============================== */
@@ -123,7 +92,6 @@ const P = {
   reset:'<path d="M4 12a8 8 0 112.5 5.8"/><path d="M4 5v7h7"/>',
   check:'<path d="M4 12l5 5L20 6"/>',
   x:'<path d="M5 5l14 14M19 5L5 19"/>',
-  chev:'<path d="M6 9l6 6 6-6"/>',
   edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
   trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
   cloud:'<path d="M7 18a4.5 4.5 0 01-.5-9A6 6 0 0118 10a4 4 0 010 8z"/>',
@@ -132,20 +100,17 @@ const P = {
   swap:'<path d="M4 8h14l-3-3M20 16H6l3 3"/>',
   back:'<path d="M15 5l-7 7 7 7"/>',
   next:'<path d="M9 5l7 7-7 7"/>',
-  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3"/>',
-  list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
   book:'<path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 21h15"/>',
   volume:'<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 010 6"/>',
-  eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
-  eyeoff:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/>',
-  lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/>',
-  screen:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>'
+  share:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/>',
+  save:'<path d="M5 3h11l4 4v14H5z"/><path d="M8 3v6h8V3M8 21v-7h8v7"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
+  spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>',
+  folder:'<path d="M3 6a2 2 0 012-2h4l2 3h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>'
 };
 function ic(n, s) { s = s || 20; return '<svg class="ic" width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (P[n] || '') + '</svg>'; }
 function hydrate() { document.querySelectorAll('[data-i]').forEach(function (el) { el.innerHTML = ic(el.dataset.i, +el.dataset.s || 20); }); }
-
-/* Emblem fallback (inline SVG) if icon.png / small-icon.png are not present */
 function emblem(large) {
   const svg = large
     ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><rect width="256" height="256" rx="48" fill="#09090b"/><rect x="8" y="8" width="240" height="240" rx="42" fill="none" stroke="#10b981" stroke-width="4"/><path d="M60 60h136a14 14 0 0114 14v72a14 14 0 01-14 14h-70l-34 28v-28H60a14 14 0 01-14-14V74a14 14 0 0114-14z" fill="none" stroke="#10b981" stroke-width="8" stroke-linejoin="round"/><text x="128" y="132" font-family="Arial,Helvetica,sans-serif" font-size="52" font-weight="800" fill="#f1f5f9" text-anchor="middle">IST</text><text x="128" y="206" font-family="Arial,Helvetica,sans-serif" font-size="30" font-weight="800" fill="#10b981" text-anchor="middle" letter-spacing="4">ASSIST</text><text x="128" y="230" font-family="Arial,Helvetica,sans-serif" font-size="11" fill="#a1a1aa" text-anchor="middle">IELTS Speaking Test Assistant</text></svg>'
@@ -161,10 +126,10 @@ function fixImgs(root) {
   });
 }
 
-/* ============================== QUESTION BANK (built-in seed) ============================== */
+/* ============================== BUILT-IN QUESTION BANK ============================== */
 function C(t, b, f) { return { t: t, b: b, f: f }; }
 const BK = {
-  warm: [
+  friendly: [
     "How are you today?","How did you get to school today?","Did you have breakfast this morning?","What did you have for breakfast?","What time did you get up today?",
     "How was your weekend?","What's the weather like today?","Did you sleep well last night?","Are you feeling a bit nervous?","What did you do last night?",
     "What's your favourite subject at school?","Have you had a good week so far?","What are you going to do after class today?","Did you do anything fun yesterday?","How are you feeling about the test?",
@@ -176,17 +141,28 @@ const BK = {
     "Did you exercise today?","Do you like the weather today?","Did you talk to your friends before class?","What is your favourite thing to do after school?","What are you having for dinner tonight?",
     "How many hours did you sleep last night?","Did you finish your homework?","What's something you are looking forward to?","Is there anything you want to ask me before we start?","Are you ready to begin?"
   ],
-  intro: [
-    "Can you tell me your full name, please?","What shall I call you?","Can I see your identification, please?","Where are you from?","Where do you live at the moment?","Do you work or are you a student?"
+  p1: [
+    "Do you live in a house or an apartment?","Who do you live with?","What is your favourite food?","Do you like your school?","What do you do on weekends?","What sports do you like?","Do you have any pets?","What time do you get up every day?","Do you like music? What music do you like?","What is the weather like in your city?","How do you go to school?","Do you like shopping?","What do you do with your friends?","What is your favourite colour?","Do you like watching TV? What shows do you like?",
+    "Tell me about the place where you live.","What do you like about your hometown?","What do you usually do in the evening?","Why do you like your favourite subject?","Do you prefer to stay at home or go out on weekends? Why?","What kind of food do you eat most often?","How often do you use your phone? What do you use it for?","Tell me about your best friend.","Do you like cooking? Why or why not?","What kind of weather do you like best? Why?","What do you do to relax after school?","Do you often travel? Where do you like to go?","What was your favourite toy when you were young?","Do you enjoy reading? What do you read?","What is your daily routine like?",
+    "What do you enjoy most about the area where you live?","How has your hometown changed in recent years?","Do you think you spend enough time with your family? Why?","What are the advantages of studying at your school?","How do you usually spend your free time, and has that changed since you were younger?","Do you prefer eating at home or in restaurants? Why?","How important is it for you to exercise regularly?","What kind of transport do you usually use, and why?","Is there anything you would like to change about your daily routine?","How do you keep in touch with friends who live far away?","What kind of music did you enjoy as a child compared to now?","How do you feel about learning English?","Do you think people spend too much time on social media? Why?","What do you usually do on public holidays?","Would you like to live in a different country? Why or why not?"
   ],
-  p1: {
-    4: ["Do you live in a house or an apartment?","Who do you live with?","What is your favourite food?","Do you like your school?","What do you do on weekends?","What sports do you like?","Do you have any pets?","What time do you get up every day?","Do you like music? What music do you like?","What is the weather like in your city?","How do you go to school?","Do you like shopping?","What do you do with your friends?","What is your favourite colour?","Do you like watching TV? What shows do you like?"],
-    5: ["Tell me about the place where you live.","What do you like about your hometown?","What do you usually do in the evening?","Why do you like your favourite subject?","Do you prefer to stay at home or go out on weekends? Why?","What kind of food do you eat most often?","How often do you use your phone? What do you use it for?","Tell me about your best friend.","Do you like cooking? Why or why not?","What kind of weather do you like best? Why?","What do you do to relax after school?","Do you often travel? Where do you like to go?","What was your favourite toy when you were young?","Do you enjoy reading? What do you read?","What is your daily routine like?"],
-    6: ["What do you enjoy most about the area where you live?","How has your hometown changed in recent years?","Do you think you spend enough time with your family? Why?","What are the advantages of studying at your school?","How do you usually spend your free time, and has that changed since you were younger?","Do you prefer eating at home or in restaurants? Why?","How important is it for you to exercise regularly?","What kind of transport do you usually use, and why?","Is there anything you would like to change about your daily routine?","How do you keep in touch with friends who live far away?","What kind of music did you enjoy as a child compared to now?","How do you feel about learning English?","Do you think people spend too much time on social media? Why?","What do you usually do on public holidays?","Would you like to live in a different country? Why or why not?"],
-    7: ["What do you think makes a neighbourhood a good place to live?","In what ways has technology changed the way you study?","Do you think it's important to keep traditions alive in your hometown? Why?","How do you decide what to spend your money on?","What role does sport play in your life, and has it always been that way?","Some people say that cooking at home is a dying skill. Would you agree?","How do you cope when you feel stressed about schoolwork?","What do you think about the amount of homework students are given these days?","Do you think it's better to have a few close friends or lots of casual ones?","How would you describe the way people in your country spend their weekends?","What would you say is the biggest challenge of learning a foreign language?","How has your taste in music or films developed over the years?","To what extent do you rely on your phone in your everyday life?","Is there a skill you would like to master, and what's stopping you?","How do you think your city will look in twenty years?"],
-    8: ["What aspects of your upbringing have shaped the person you are today?","To what extent do you feel your hometown has influenced your outlook on life?","How do you strike a balance between your studies and your personal interests?","Do you think people are becoming more or less connected because of technology?","What do you consider to be the most valuable lesson you've learned outside the classroom?","How do you think attitudes towards work and leisure differ between generations?","Would you say that your daily routine reflects your priorities?","What is it about certain places that makes them feel like home?","How far do you think the food people eat reflects their culture?","Can you think of a time when you had to step out of your comfort zone?","In your view, how important is it to preserve local languages and dialects?","What factors influence the way you make important decisions?","How has your attitude towards learning changed as you've grown older?","Is it more rewarding to spend money on experiences or on possessions?","What's your take on the role of social media in shaping young people's opinions?"]
-  },
   cards: {
+    1: [
+      C("Describe your family.",["who is in your family","how old they are","what they like to do","and say if you like your family"],["Do you have a big family?","Do you live with your family?","Do you like to eat with your family?","Do you see your family every day?"]),
+      C("Describe your school bag.",["what colour it is","what is inside","who bought it","and say if you like it"],["Do you carry a bag every day?","Is your bag heavy?","What do other students carry to school?","Do you want a new bag?"]),
+      C("Describe your favourite fruit.",["what it is","what colour it is","what it tastes like","and say why you like it"],["Do you eat fruit every day?","Is fruit cheap in your country?","Do children like fruit?","Do you like fruit juice?"])
+    ],
+    2: [
+      C("Describe your bedroom.",["what is in it","what colour it is","who sleeps there","and say why you like it"],["Do you share your bedroom?","What do you do in your bedroom?","Do you keep your room clean?","What do children want in their bedroom?"]),
+      C("Describe your favourite animal.",["what it is","where you can see it","what it eats","and say why you like it"],["Do you have a pet?","Do you like dogs or cats?","Is it good to keep animals at home?","Do you like going to the zoo?"]),
+      C("Describe a person in your class.",["what his or her name is","what he or she looks like","what he or she likes","and say why you like this person"],["Do you have many friends in class?","What do you do with your friends?","Do you talk to your friends every day?","Is it good to have many friends?"])
+    ],
+    3: [
+      C("Describe your last holiday.",["where you went","who you went with","what you did","and say if you enjoyed it"],["Do you like holidays?","Where do people in your country go on holiday?","Do you prefer the beach or the mountains?","Is it good to travel with your family?"]),
+      C("Describe a day you enjoyed.",["when it was","where you were","what you did","and say why you enjoyed it"],["Do you like weekends?","What do people do on their day off?","Do you prefer to stay home or go out?","What is a good day for children?"]),
+      C("Describe your favourite place at school.",["where it is","what you do there","who you go with","and say why you like it"],["Do you like your school?","What places are in a school?","Do students like the library?","What would you add to your school?"]),
+      C("Describe a meal you like.",["what the meal is","who makes it","when you eat it","and say why you like it"],["Do you cook at home?","What food is popular in your country?","Do you like restaurants?","Is it good to eat with your family?"])
+    ],
     4: [
       C("Describe your favourite food.",["what it is","who makes it","when you eat it","and say why you like it"],["Do you like to cook?","What food do children like to eat?","Is food expensive in your country?","Do you eat in restaurants often?"]),
       C("Describe your best friend.",["who this person is","how you met","what you do together","and say why you like this person"],["Do you have many friends?","Where do people make friends?","Do you talk to your friends every day?","Is it good to have a lot of friends?"]),
@@ -226,41 +202,83 @@ const BK = {
       C("Describe a piece of advice that has stayed with you.",["what the advice was","who gave it to you","when you received it","and explain why it has stayed with you"],["Why do people sometimes ignore good advice?","Is advice from older people always more valuable?","How has the internet changed the way people seek advice?","Should people follow advice or trust their own instincts?"]),
       C("Describe a time when technology let you down at an important moment.",["what happened","what you were trying to do","how you dealt with it","and explain what you would do differently"],["Are people too dependent on technology in their daily lives?","What risks come with a society that relies heavily on technology?","Should there be limits on how much technology children use?","How can people prepare for technology failures?"]),
       C("Describe a family tradition you would like to keep.",["what the tradition is","how it started","who takes part","and explain why you want to keep it"],["Why are traditions important to a society?","Do you think globalisation is threatening local traditions?","Can new traditions replace old ones meaningfully?","What responsibility do younger generations have to preserve culture?"])
+    ],
+    9: [
+      C("Describe an occasion when you changed your mind about something important.",["what you believed before","what made you reconsider","how other people reacted","and explain what this taught you about yourself"],["To what extent is changing one's mind a sign of strength rather than weakness?","How does the media influence what people believe?","Do you think societies change their values faster today than in the past?","What role should evidence play in public debate?"]),
+      C("Describe a work of art or a building that left a strong impression on you.",["what it is and where you saw it","what it looks like","what the context was","and explain why it affected you so deeply"],["Should governments subsidise the arts when budgets are tight?","How does public art shape the identity of a city?","Is it still possible for contemporary works to be considered timeless?","To what degree does heritage determine a country's modern culture?"]),
+      C("Describe a time when you had to make a difficult ethical choice.",["what the situation was","what the options were","what you decided","and explain how you feel about that decision now"],["Are moral values universal, or do they depend on culture?","Should individuals or institutions bear responsibility for ethical failures?","How far can businesses be expected to act ethically when profit is at stake?","Is it possible to teach ethics effectively in schools?"]),
+      C("Describe an innovation that you think will change society.",["what the innovation is","how it works","who will benefit","and explain why you think it will be so influential"],["Do technological advances always lead to social progress?","Who should regulate emerging technologies?","How can societies prepare workers for rapid technological change?","Is there a risk that innovation widens inequality?"])
     ]
   }
 };
-const BANDS = [4, 5, 6, 7, 8];
 
 /* ============================== STATE ============================== */
-const LS = 'ist_assist_v1';
-function defaults() {
-  return {
-    classes: [], rounds: [], results: [], queue: [], hidden: {}, used: {},
-    custom: { warm: [], intro: [], p1: {}, cards: {} },
-    ui: { tab: 'classes', open: {}, round: {}, rclass: '', ropen: {} },
-    settings: { theme: 'black', accent: '#10b981', mode: 'own', nWarm: 3, nP1: 4, nP3: 4, sound: true, fullBand: 9, webhook: '', lastBand: 6, pin: '', rec: '' }
-  };
+const LS = 'ist_assist_v2';
+function defSettings() {
+  return { theme: 'black', accent: '#10b981', nFriendly: 3, nP1: 6, nP3: 4, sound: true, fullBand: 9, lastBand: 6,
+    audio: { mode: 'download', kbps: 24 },
+    ai: { stt: 'whisper', sttModel: 'Xenova/whisper-base.en', provider: 'none', key: '', model: 'claude-sonnet-5-5', base: 'http://localhost:11434/v1', auto: true } };
 }
-let S = defaults();
-try {
-  const raw = JSON.parse(localStorage.getItem(LS) || 'null');
-  if (raw) { S = Object.assign(defaults(), raw); S.settings = Object.assign(defaults().settings, raw.settings || {}); S.ui = Object.assign(defaults().ui, raw.ui || {}); S.custom = Object.assign(defaults().custom, raw.custom || {}); }
-} catch (e) {}
+function defaults() { return { classes: [], tests: [], queue: [], used: {}, bank: JSON.parse(JSON.stringify({ friendly: BK.friendly, p1: BK.p1, cards: BK.cards })), settings: defSettings() }; }
+function calcBand(sc) { const avg = (sc.fc + sc.lr + sc.gra + sc.pr) / 4; return Math.round(avg * 2) / 2; }
+function recalc(t, fb) { t.band = calcBand(t.scores); t.pct = Math.min(100, Math.round(t.band / (fb || 9) * 100)); }
+function newTestRec(o, fb) {
+  const t = Object.assign({ id: uid(), classId: '', studentId: '', studentName: '', className: '', date: today(), time: '', created: Date.now(), target: 6, dur: 0, q: {}, scores: { fc: 6, lr: 6, gra: 6, pr: 6 }, notes: '', transcript: '', feedback: '', followup: '', ai: null, edited: false, fbEdited: false, saved: false, audio: null, audioFile: '' }, o);
+  recalc(t, fb); return t;
+}
+function migrate(old, d) {
+  try {
+    const wh = (old.settings && old.settings.webhook) || '';
+    d.classes = (old.classes || []).map(function (c) { return { id: c.id, name: c.name, students: c.students || [], webhook: wh }; });
+    (old.results || []).forEach(function (r) {
+      const rd = (old.rounds || []).find(function (x) { return x.id === r.roundId; }) || {};
+      const cl = d.classes.find(function (x) { return x.id === r.classId; });
+      d.tests.push(newTestRec({ id: r.id, classId: r.classId, studentId: r.studentId, studentName: r.studentName, className: cl ? cl.name : '', date: r.date, created: Date.parse(r.date) || Date.now(), target: rd.band || 6, scores: r.scores, notes: r.notes || '', saved: true, edited: true }));
+    });
+    const cu = old.custom || {};
+    (cu.warm || []).forEach(function (q) { d.bank.friendly.push(q); });
+    Object.keys(cu.p1 || {}).forEach(function (b) { (cu.p1[b] || []).forEach(function (q) { d.bank.p1.push(q); }); });
+    Object.keys(cu.cards || {}).forEach(function (b) { (cu.cards[b] || []).forEach(function (c) { if (d.bank.cards[b]) d.bank.cards[b].push(c); }); });
+    const st = old.settings || {}; d.settings.accent = st.accent || d.settings.accent; d.settings.theme = st.theme || d.settings.theme;
+  } catch (e) {}
+  return d;
+}
+function load() {
+  const d = defaults();
+  try {
+    const raw = JSON.parse(localStorage.getItem(LS) || 'null');
+    if (raw) {
+      const o = Object.assign(d, raw), rs = raw.settings || {};
+      o.settings = Object.assign(defSettings(), rs);
+      o.settings.audio = Object.assign(defSettings().audio, rs.audio || {});
+      o.settings.ai = Object.assign(defSettings().ai, rs.ai || {});
+      o.bank = o.bank || {}; o.bank.friendly = o.bank.friendly || []; o.bank.p1 = o.bank.p1 || []; o.bank.cards = o.bank.cards || {};
+      for (let b = 1; b <= 9; b++) if (!Array.isArray(o.bank.cards[b])) o.bank.cards[b] = [];
+      return o;
+    }
+    const old = localStorage.getItem('ist_assist_v1');
+    if (old) return migrate(JSON.parse(old), d);
+  } catch (e) {}
+  return d;
+}
+var S = load();
 function save() { try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) { toast('Storage full or blocked'); } }
+let saveTimer = null;
+function saveSoon() { clearTimeout(saveTimer); saveTimer = setTimeout(save, 400); }
 
 /* ============================== HELPERS ============================== */
 const $ = function (s) { return document.querySelector(s); };
 const esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
-const uid = function () { return Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-3); };
-const shuffle = function (a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
+function uid() { return Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-3); }
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
 function today() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
-function monthKey() { return today().slice(0, 7); }
-function monthLabel(m) { if (!m) return ''; const p = m.split('-'); try { return new Date(+p[0], +p[1] - 1, 1).toLocaleDateString('en', { month: 'short', year: 'numeric' }); } catch (e) { return m; } }
-const fmt = function (s) { return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+function hhmm() { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+function fmt(s) { return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+function safe(s) { return String(s || '').replace(/[\\\/:*?"<>|]+/g, '').replace(/\s+/g, ' ').trim() || 'x'; }
+function pctOf(band) { return Math.min(100, Math.round(band / (S.settings.fullBand || 9) * 100)); }
+function recalcT(t) { t.band = calcBand(t.scores); t.pct = pctOf(t.band); }
 let toastTimer = null;
-function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.add('hidden'); }, 2600); }
-function pct(band) { return Math.min(100, Math.round(band / (S.settings.fullBand || 9) * 100)); }
-function calcBand(sc) { const avg = (sc.fc + sc.lr + sc.gra + sc.pr) / 4; return Math.round(avg * 2) / 2; }
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.add('hidden'); }, 3200); }
 function parseNames(t) {
   const seen = new Set(), out = [];
   String(t || '').split(/\r?\n/).forEach(function (l) {
@@ -269,9 +287,20 @@ function parseNames(t) {
   });
   return out;
 }
-function roundsOf(cid) { return S.rounds.filter(function (r) { return r.classId === cid; }).sort(function (a, b) { return a.created - b.created; }); }
-function curRound(c) { const rs = roundsOf(c.id); return rs.find(function (r) { return r.id === S.ui.round[c.id]; }) || rs[rs.length - 1] || null; }
-function resFor(sid, rid) { return S.results.find(function (r) { return r.studentId === sid && r.roundId === rid; }); }
+function testsOf(sid) { return S.tests.filter(function (t) { return t.studentId === sid; }).sort(function (a, b) { return b.created - a.created; }); }
+function download(name, blob) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+}
+function copyText(txt) {
+  const done = function () { toast('Copied'); };
+  function fb() { const t = document.createElement('textarea'); t.value = txt; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); done(); } catch (e) { toast('Copy failed'); } t.remove(); }
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, fb); else fb();
+}
+function blobToB64(blob) { return new Promise(function (res, rej) { const r = new FileReader(); r.onload = function () { res(String(r.result).split(',')[1] || ''); }; r.onerror = rej; r.readAsDataURL(blob); }); }
+function loadScript(src) { return new Promise(function (res, rej) { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = function () { rej(new Error('load')); }; document.head.appendChild(s); }); }
+async function needXlsx() { if (window.XLSX) return; try { await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'); } catch (e) { throw new Error('The spreadsheet library needs internet the first time you use it.'); } }
+function isNative() { return !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform()); }
 
 /* ============================== THEME ============================== */
 function setAccentColor(hex) { S.settings.accent = hex; save(); document.documentElement.style.setProperty('--accent-color', hex); }
@@ -284,21 +313,120 @@ function setAppTheme(theme) {
   if (meta) meta.setAttribute('content', { black: '#000000', dark: '#0f172a', light: '#f1f5f9' }[theme]);
 }
 
-/* ============================== QUESTION BANK ACCESS ============================== */
-function items(kind, band) {
-  let built, cust;
-  if (kind === 'warm') { built = BK.warm; cust = S.custom.warm; }
-  else if (kind === 'intro') { built = BK.intro; cust = S.custom.intro; }
-  else if (kind === 'p1') { built = BK.p1[band] || []; cust = S.custom.p1[band] || []; }
-  else { built = BK.cards[band] || []; cust = S.custom.cards[band] || []; }
-  const b = (kind === 'p1' || kind === 'cards') ? band : 0;
-  const mk = function (x, builtin, i) { const id = kind + '|' + b + '|' + (kind === 'cards' ? x.t : x); return { x: x, builtin: builtin, i: i, id: id, hidden: !!S.hidden[id] }; };
-  return built.map(function (x, i) { return mk(x, true, i); }).concat(cust.map(function (x, i) { return mk(x, false, i); }));
+/* ============================== INDEXEDDB (audio + folder handle) ============================== */
+let DBP = null;
+function idb() {
+  if (DBP) return DBP;
+  DBP = new Promise(function (res, rej) {
+    const r = indexedDB.open('ist_assist', 1);
+    r.onupgradeneeded = function () { r.result.createObjectStore('audio'); r.result.createObjectStore('kv'); };
+    r.onsuccess = function () { res(r.result); }; r.onerror = function () { rej(r.error); };
+  });
+  return DBP;
 }
-function active(kind, band) { return items(kind, band).filter(function (o) { return !o.hidden; }).map(function (o) { return o.x; }); }
+function idbOp(store, mode, fn) {
+  return idb().then(function (db) {
+    return new Promise(function (res, rej) {
+      const tx = db.transaction(store, mode); let rq;
+      try { rq = fn(tx.objectStore(store)); } catch (e) { rej(e); return; }
+      tx.oncomplete = function () { res(rq && rq.result); }; tx.onerror = function () { rej(tx.error); }; tx.onabort = function () { rej(tx.error); };
+    });
+  });
+}
+const audioPut = function (id, b) { return idbOp('audio', 'readwrite', function (s) { return s.put(b, id); }); };
+const audioGet = function (id) { return idbOp('audio', 'readonly', function (s) { return s.get(id); }); };
+const audioDel = function (id) { return idbOp('audio', 'readwrite', function (s) { return s.delete(id); }); };
+const kvPut = function (k, v) { return idbOp('kv', 'readwrite', function (s) { return s.put(v, k); }); };
+const kvGet = function (k) { return idbOp('kv', 'readonly', function (s) { return s.get(k); }); };
+
+/* ============================== NAVIGATION ============================== */
+var V = { name: 'home' };
+function go(name, p) { V = Object.assign({ name: name }, p || {}); try { history.pushState({ v: V }, ''); } catch (e) {} render(); window.scrollTo(0, 0); }
+function backBtn(label) { return '<button class="btn" data-act="back">' + ic('back', 16) + ' ' + esc(label || 'Back') + '</button>'; }
+
+function render() {
+  const c = V.classId && S.classes.find(function (x) { return x.id === V.classId; });
+  const t = V.testId && S.tests.find(function (x) { return x.id === V.testId; });
+  const s = c && V.studentId && c.students.find(function (x) { return x.id === V.studentId; });
+  let h = '';
+  switch (V.name) {
+    case 'class': h = c ? viewClass(c) : viewHome(); break;
+    case 'student': h = (c && s) ? viewStudent(c, s) : viewHome(); break;
+    case 'result': h = t ? viewResult(t) : viewHome(); break;
+    case 'settings': h = viewSettings(); break;
+    case 'bank': h = viewBank(); break;
+    default: h = viewHome();
+  }
+  $('#view').innerHTML = h; fixImgs($('#view')); afterRender();
+}
+function afterRender() {
+  if (V.name === 'result') {
+    const t = S.tests.find(function (x) { return x.id === V.testId; });
+    if (t && t.audio) audioGet(t.id).then(function (b) { const el = $('#audioEl'); if (b && el) el.src = URL.createObjectURL(b); }).catch(function () {});
+  }
+  if (V.name === 'settings') {
+    kvGet('dir').then(function (h) { const el = $('#dirName'); if (el) el.textContent = h ? h.name : 'none chosen'; }).catch(function () {});
+  }
+}
+
+/* ---------- Home / Class / Student views ---------- */
+function viewHome() {
+  let h = '<div class="flex items-center justify-between"><h2 class="text-sm font-bold">Grades</h2><button class="btn btn-acc" data-act="newClass">' + ic('plus', 16) + ' New grade</button></div>';
+  if (!S.classes.length) h += '<div class="card p-6 text-center space-y-3"><div class="accent-text flex justify-center">' + ic('users', 38) + '</div><p class="font-bold">No grades yet</p><p class="text-xs muted max-w-xs mx-auto">Create a grade (e.g. Grade 7), then paste your student names in, one per line.</p></div>';
+  S.classes.forEach(function (c) {
+    const n = S.tests.filter(function (t) { return t.classId === c.id; }).length;
+    h += '<button class="card w-full p-4 text-left flex items-center justify-between gap-3" data-act="openClass" data-id="' + c.id + '"><div class="min-w-0"><div class="font-bold text-sm truncate">' + esc(c.name) + '</div><div class="text-[11px] muted">' + c.students.length + ' students · ' + n + ' tests' + (c.webhook ? ' · Sheets linked' : '') + '</div></div>' + ic('next', 18) + '</button>';
+  });
+  return h;
+}
+function viewClass(c) {
+  let h = '<div class="flex items-center justify-between gap-2">' + backBtn('Grades') + '<button class="btn" data-act="editClass" data-id="' + c.id + '">' + ic('edit', 14) + ' Edit grade</button></div><div><h2 class="text-lg font-bold">' + esc(c.name) + '</h2><div class="text-[11px] muted">' + c.students.length + ' students</div></div>';
+  if (!c.students.length) h += '<div class="card p-5 text-center text-xs muted">No students yet. Tap Edit grade and paste the names.</div>';
+  c.students.forEach(function (s, i) {
+    const ts = testsOf(s.id), last = ts[0];
+    h += '<div class="card p-3 space-y-2"><div class="min-w-0"><div class="text-sm font-semibold truncate">' + (i + 1) + '. ' + esc(s.name) + '</div><div class="text-[11px] muted">' + (ts.length ? ts.length + ' test' + (ts.length > 1 ? 's' : '') + ' · last: Band ' + last.band.toFixed(1) + ' · ' + last.pct + '%' : 'No tests yet') + '</div></div>' +
+      '<div class="grid grid-cols-5 gap-2"><button class="btn btn-acc col-span-2" data-act="testStart" data-sid="' + s.id + '">' + ic('mic', 14) + ' Test</button><button class="btn col-span-2" data-act="openStudent" data-sid="' + s.id + '">' + ic('chart', 14) + ' Results</button><button class="btn btn-danger" data-act="delStudent" data-sid="' + s.id + '" aria-label="Delete student">' + ic('trash', 14) + '</button></div></div>';
+  });
+  return h;
+}
+function viewStudent(c, s) {
+  const ts = testsOf(s.id);
+  let h = '<div class="flex items-center justify-between gap-2">' + backBtn(c.name) + '<button class="btn btn-acc" data-act="testStart" data-sid="' + s.id + '">' + ic('mic', 14) + ' New test</button></div>' +
+    '<div class="flex items-center gap-2"><div><h2 class="text-lg font-bold">' + esc(s.name) + '</h2><div class="text-[11px] muted">' + esc(c.name) + ' · ' + ts.length + ' test' + (ts.length === 1 ? '' : 's') + '</div></div><button class="btn" data-act="renameStudent" data-sid="' + s.id + '" aria-label="Rename">' + ic('edit', 14) + '</button></div>';
+  if (!ts.length) h += '<div class="card p-5 text-center text-xs muted">No tests yet. Tap New test.</div>';
+  ts.forEach(function (t) {
+    h += '<div class="card p-3 flex items-center justify-between gap-2"><button class="min-w-0 text-left flex-1" data-act="openTest" data-id="' + t.id + '"><div class="text-sm font-semibold">' + esc(t.date) + ' <span class="chip">Target ' + t.target + '</span> <span class="chip ' + (t.saved ? 'on' : '') + '">' + (t.saved ? 'Saved' : 'Draft') + '</span></div><div class="text-xs"><b class="accent-text">Band ' + t.band.toFixed(1) + '</b> · ' + t.pct + '%' + (t.audio ? ' · audio' : '') + '</div></button><button class="btn btn-danger" data-act="delTest" data-id="' + t.id + '" aria-label="Delete test">' + ic('trash', 14) + '</button></div>';
+  });
+  return h;
+}
+
+/* ---------- Sheets / modals ---------- */
+function sheet(html) {
+  const el = $('#sheet');
+  el.innerHTML = '<div class="card w-full sm:max-w-lg max-h-[92vh] overflow-y-auto p-5 space-y-4" style="border-radius:1.5rem 1.5rem 0 0">' + html + '</div>';
+  el.classList.remove('hidden'); fixImgs(el);
+}
+function closeSheet() { const el = $('#sheet'); el.classList.add('hidden'); el.innerHTML = ''; }
+function sheetHead(title) { return '<div class="flex items-center justify-between"><h3 class="font-bold text-base">' + title + '</h3><button class="btn" data-act="closeSheet" aria-label="Close">' + ic('x', 16) + '</button></div>'; }
+function classModal(id) {
+  const c = id && S.classes.find(function (x) { return x.id === id; });
+  sheet(sheetHead(c ? 'Edit grade' : 'New grade') +
+    '<div class="space-y-1"><label class="text-xs font-semibold muted">Grade name</label><input id="cmName" class="inp" placeholder="e.g. Grade 7" value="' + esc(c ? c.name : '') + '"></div>' +
+    '<div class="space-y-1"><label class="text-xs font-semibold muted">Students (paste a column from Excel/Sheets, one name per line)</label><textarea id="cmNames" class="inp" rows="9" placeholder="Sok Dara&#10;Chan Sophea">' + esc(c ? c.students.map(function (s) { return s.name; }).join('\n') : '') + '</textarea></div>' +
+    '<div class="space-y-1"><label class="text-xs font-semibold muted">Google Sheets webhook for this grade (optional)</label><input id="cmHook" class="inp" placeholder="https://script.google.com/macros/s/.../exec" value="' + esc(c ? c.webhook : '') + '"></div>' +
+    (c ? '<div class="flex gap-2"><button class="btn flex-1" data-act="syncClass" data-id="' + c.id + '">' + ic('cloud', 14) + ' Send all results</button><button class="btn btn-danger" data-act="delClass" data-id="' + c.id + '">' + ic('trash', 14) + ' Delete grade</button></div>' : '') +
+    '<button class="btn btn-acc btn-lg w-full" data-act="saveClass" data-id="' + (c ? c.id : '') + '">' + ic('check', 18) + ' Save</button>');
+}
+function bandSheet(sid) {
+  let h = sheetHead('Select band level') + '<div class="text-xs muted">Part 2 and Part 3 questions come from the band you choose.</div><div class="grid grid-cols-3 gap-2">';
+  for (let b = 1; b <= 9; b++) h += '<button class="btn ' + (b === S.settings.lastBand ? 'btn-acc' : '') + ' btn-lg flex-col" data-act="pickBand" data-sid="' + sid + '" data-b="' + b + '"><span>Band ' + b + '</span><span class="text-[10px] font-normal opacity-80">' + (S.bank.cards[b] || []).length + ' cards</span></button>';
+  sheet(h + '</div>');
+}
+
+/* ============================== QUESTION PICKING ============================== */
 function pickFresh(poolKey, arr, n, keyFn) {
   keyFn = keyFn || function (x) { return x; };
-  if (!arr.length) return [];
+  if (!arr.length || n <= 0) return [];
   S.used[poolKey] = S.used[poolKey] || [];
   const used = S.used[poolKey];
   let chosen = shuffle(arr.filter(function (i) { return used.indexOf(keyFn(i)) < 0; })).slice(0, n);
@@ -313,7 +441,7 @@ function pickFresh(poolKey, arr, n, keyFn) {
   return chosen;
 }
 
-/* ============================== SOUND / TIMER ============================== */
+/* ============================== SOUND / TIMER / WAKE ============================== */
 let AC = null;
 function ensureAC() { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); } catch (e) {} }
 function beep() {
@@ -336,462 +464,639 @@ function tmDraw() {
 }
 function tmTick() {
   if (!TM.running) return;
-  TM.left = Math.max(0, Math.ceil((TM.end - Date.now()) / 1000));
-  tmDraw();
+  TM.left = Math.max(0, Math.ceil((TM.end - Date.now()) / 1000)); tmDraw();
   if (TM.left <= 0) { tmStop(); beep(); const f = TM.onDone; TM.onDone = null; if (f) f(); }
 }
-function tmStart(total, onDone) {
-  tmStop(); ensureAC();
-  TM = { total: total, left: total, running: true, end: Date.now() + total * 1000, iv: null, onDone: onDone };
-  TM.iv = setInterval(tmTick, 200); tmDraw();
-}
+function tmStart(total, onDone) { tmStop(); ensureAC(); TM = { total: total, left: total, running: true, end: Date.now() + total * 1000, iv: null, onDone: onDone }; TM.iv = setInterval(tmTick, 200); tmDraw(); }
 let WL = null;
 async function wake() { try { WL = await navigator.wakeLock.request('screen'); } catch (e) {} }
 function unwake() { try { if (WL) WL.release(); } catch (e) {} WL = null; }
 
-/* ============================== MAIN VIEWS ============================== */
-function render() {
-  $('#view').innerHTML = S.ui.tab === 'results' ? viewResults() : viewClasses();
-  $('#navClasses').classList.toggle('on', S.ui.tab !== 'results');
-  $('#navResults').classList.toggle('on', S.ui.tab === 'results');
+/* ============================== LIVE TEST ============================== */
+var T = null;
+function beginSetup(sid, band) {
+  const c = S.classes.find(function (x) { return x.id === V.classId; });
+  const st = c && c.students.find(function (s) { return s.id === sid; });
+  if (!st) return;
+  const cards = S.bank.cards[band] || [];
+  if (!cards.length) { toast('No Part 2 cards for band ' + band + '. Add some in Settings → Question bank.'); return; }
+  S.settings.lastBand = band; save();
+  const o = S.settings;
+  const card = pickFresh('cards_' + band, cards, 1, function (x) { return x.t; })[0];
+  T = { cid: c.id, sid: sid, name: st.name, cname: c.name, band: band, step: 'ready', checks: {}, notes: '', p2: 0, rec: null, t0: 0, recIv: null, card: card,
+    q: { friendly: pickFresh('friendly', S.bank.friendly, o.nFriendly), p1: pickFresh('p1', S.bank.p1, o.nP1), p3: card.f.slice(0, o.nP3) } };
+  closeSheet(); $('#testView').classList.remove('hidden'); renderTest();
 }
-
-function viewClasses() {
-  let h = '<div class="flex items-center justify-between"><h2 class="text-sm font-bold">Classes</h2><button class="btn btn-acc" data-act="newClass">' + ic('plus', 16) + ' New class</button></div>';
-  if (!S.classes.length) {
-    h += '<div class="card p-6 text-center space-y-3"><div class="accent-text flex justify-center">' + ic('users', 38) + '</div><p class="font-bold">No classes yet</p><p class="text-xs muted max-w-xs mx-auto">Create a class (e.g. Grade 7), then paste your student names in, one per line.</p></div>';
-  }
-  S.classes.forEach(function (c) {
-    const rounds = roundsOf(c.id), cur = curRound(c), open = !!S.ui.open[c.id];
-    const done = cur ? c.students.filter(function (s) { return resFor(s.id, cur.id); }).length : 0;
-    h += '<div class="card overflow-hidden"><button class="w-full flex items-center justify-between p-4 text-left" data-act="toggleClass" data-id="' + c.id + '"><div class="min-w-0"><div class="font-bold text-sm truncate">' + esc(c.name) + '</div><div class="text-[11px] muted">' + c.students.length + ' students' + (cur ? ' · ' + esc(cur.label) + ' · Band ' + cur.band + ' · ' + done + '/' + c.students.length + ' done' : '') + '</div></div><span class="chev ' + (open ? 'rot' : '') + '">' + ic('chev', 18) + '</span></button>';
-    if (open) {
-      h += '<div class="border-t bb p-3 space-y-3"><div class="flex flex-wrap items-center gap-2">';
-      if (rounds.length) {
-        h += '<select class="inp" style="width:auto;max-width:100%" data-chg="round" data-id="' + c.id + '">' + rounds.map(function (r) { return '<option value="' + r.id + '"' + (cur && r.id === cur.id ? ' selected' : '') + '>' + esc(r.label) + ' · ' + monthLabel(r.month) + ' · Band ' + r.band + '</option>'; }).join('') + '</select>';
-      }
-      h += '<button class="btn" data-act="newRound" data-id="' + c.id + '">' + ic('plus', 14) + ' New test</button></div>';
-      if (!cur) h += '<p class="text-xs muted">Set up this month\'s test (choose the target band) to start testing students.</p>';
-      if (!c.students.length) h += '<p class="text-xs muted">No students yet. Tap Edit class to paste names.</p>';
-      c.students.forEach(function (s, i) {
-        const rs = cur && resFor(s.id, cur.id);
-        h += '<div class="flex items-center justify-between gap-2 py-2 border-b bb"><div class="min-w-0"><div class="text-sm font-medium truncate">' + (i + 1) + '. ' + esc(s.name) + '</div><div class="text-[11px] ' + (rs ? 'accent-text' : 'muted') + '">' + (rs ? 'Band ' + rs.band.toFixed(1) + ' · ' + rs.pct + '%' : 'Not tested') + '</div></div>' +
-          (cur ? '<button class="btn ' + (rs ? '' : 'btn-acc') + '" data-act="start" data-sid="' + s.id + '" data-cid="' + c.id + '" data-rid="' + cur.id + '">' + ic(rs ? 'reset' : 'mic', 14) + ' ' + (rs ? 'Retest' : 'Start') + '</button>' : '') + '</div>';
-      });
-      h += '<div class="flex gap-2 pt-1"><button class="btn" data-act="editClass" data-id="' + c.id + '">' + ic('edit', 14) + ' Edit class</button><button class="btn btn-danger" data-act="delClass" data-id="' + c.id + '">' + ic('trash', 14) + ' Delete</button></div></div>';
-    }
-    h += '</div>';
+function recMime() { const c = ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/mp4']; for (let i = 0; i < c.length; i++) { try { if (window.MediaRecorder && MediaRecorder.isTypeSupported(c[i])) return c[i]; } catch (e) {} } return ''; }
+async function recStart() {
+  if (!navigator.mediaDevices || !window.MediaRecorder) throw new Error('This browser cannot record audio.');
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: false, noiseSuppression: true, autoGainControl: true } });
+  const mime = recMime(), opts = { audioBitsPerSecond: (S.settings.audio.kbps || 24) * 1000 };
+  if (mime) opts.mimeType = mime;
+  const mr = new MediaRecorder(stream, opts), chunks = [];
+  mr.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+  mr.start(1000);
+  T.rec = { mr: mr, stream: stream, chunks: chunks, mime: mr.mimeType || mime || 'audio/webm' };
+}
+function recStop() {
+  return new Promise(function (res) {
+    const r = T && T.rec; if (!r) { res(null); return; }
+    const done = function () { try { r.stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {} res(new Blob(r.chunks, { type: r.mime })); };
+    if (r.mr.state === 'inactive') { done(); return; }
+    r.mr.onstop = done;
+    try { r.mr.stop(); } catch (e) { done(); }
   });
-  return h;
 }
-
-function viewResults() {
-  if (!S.classes.length) return '<div class="card p-6 text-center space-y-2"><div class="accent-text flex justify-center">' + ic('chart', 38) + '</div><p class="font-bold">No results yet</p><p class="text-xs muted">Create a class and run a test first.</p></div>';
-  const c = S.classes.find(function (x) { return x.id === S.ui.rclass; }) || S.classes[0];
-  const rounds = roundsOf(c.id);
-  let h = '<div class="flex flex-wrap items-center gap-2"><select class="inp" style="width:auto;flex:1" data-chg="rclass">' + S.classes.map(function (x) { return '<option value="' + x.id + '"' + (x.id === c.id ? ' selected' : '') + '>' + esc(x.name) + '</option>'; }).join('') + '</select>' +
-    '<button class="btn" data-act="csv" data-id="' + c.id + '">' + ic('download', 14) + ' CSV</button><button class="btn" data-act="syncClass" data-id="' + c.id + '">' + ic('cloud', 14) + ' Sheets</button></div>';
-  if (rounds.length) {
-    h += '<div class="flex flex-wrap gap-2">' + rounds.map(function (r) {
-      const rs = S.results.filter(function (x) { return x.roundId === r.id; });
-      const avg = rs.length ? (rs.reduce(function (a, b) { return a + b.band; }, 0) / rs.length) : null;
-      return '<span class="chip">' + esc(r.label) + ' · avg ' + (avg == null ? '–' : avg.toFixed(1)) + ' (' + rs.length + '/' + c.students.length + ')</span>';
-    }).join('') + '</div>';
-  } else h += '<p class="text-xs muted">No tests set up for this class yet.</p>';
-  c.students.forEach(function (s, i) {
-    const rs = S.results.filter(function (r) { return r.studentId === s.id; });
-    const open = !!S.ui.ropen[s.id];
-    const avg = rs.length ? rs.reduce(function (a, b) { return a + b.band; }, 0) / rs.length : null;
-    h += '<div class="card overflow-hidden"><button class="w-full flex items-center justify-between p-3 text-left gap-2" data-act="resToggle" data-id="' + s.id + '"><div class="min-w-0"><div class="text-sm font-semibold truncate">' + (i + 1) + '. ' + esc(s.name) + '</div><div class="flex flex-wrap gap-1 pt-1">' +
-      (rounds.map(function (r) { const x = resFor(s.id, r.id); return '<span class="chip ' + (x ? 'on' : '') + '">' + esc(r.label) + ' ' + (x ? x.band.toFixed(1) : '–') + '</span>'; }).join('')) + '</div></div><div class="flex items-center gap-2 flex-none"><span class="text-xs font-bold accent-text">' + (avg == null ? '' : 'Avg ' + avg.toFixed(1)) + '</span><span class="chev ' + (open ? 'rot' : '') + '">' + ic('chev', 16) + '</span></div></button>';
-    if (open) {
-      h += '<div class="border-t bb p-3 space-y-2">';
-      if (!rs.length) h += '<p class="text-xs muted">No results yet.</p>';
-      rounds.forEach(function (r) {
-        const x = resFor(s.id, r.id); if (!x) return;
-        h += '<div class="text-xs space-y-1 pb-2 border-b bb"><div class="flex justify-between"><b>' + esc(r.label) + ' · ' + monthLabel(r.month) + '</b><span class="accent-text font-bold">Band ' + x.band.toFixed(1) + ' · ' + x.pct + '%</span></div><div class="muted">Fluency ' + x.scores.fc + ' · Lexical ' + x.scores.lr + ' · Grammar ' + x.scores.gra + ' · Pron. ' + x.scores.pr + '</div>' +
-          (x.notes ? '<div>' + esc(x.notes) + '</div>' : '') + '<div class="muted">Part 2: ' + esc(x.q.card || '') + '</div><button class="btn btn-danger" data-act="delRes" data-id="' + x.id + '">' + ic('trash', 12) + ' Delete</button></div>';
-      });
-      h += '</div>';
-    }
-    h += '</div>';
-  });
-  return h;
+function extOf(mime) { return /ogg/.test(mime) ? 'ogg' : /mp4|aac/.test(mime) ? 'm4a' : 'webm'; }
+function closeTest() {
+  tmStop(); unwake();
+  if (T) { clearInterval(T.recIv); if (T.rec) { try { T.rec.stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {} } }
+  T = null; const v = $('#testView'); v.classList.add('hidden'); v.innerHTML = '';
 }
-
-/* ============================== SHEETS & FORMS ============================== */
-function sheet(html) {
-  const el = $('#sheet');
-  el.innerHTML = '<div class="card w-full sm:max-w-lg max-h-[92vh] overflow-y-auto p-5 space-y-4" style="border-radius:1.5rem 1.5rem 0 0">' + html + '</div>';
-  el.classList.remove('hidden'); fixImgs(el);
-}
-function closeSheet() { const el = $('#sheet'); el.classList.add('hidden'); el.innerHTML = ''; }
-function sheetHead(title, back) {
-  return '<div class="flex items-center justify-between"><div class="flex items-center gap-2">' + (back ? '<button class="btn" data-act="' + back + '" aria-label="Back">' + ic('back', 16) + '</button>' : '') + '<h3 class="font-bold text-base">' + title + '</h3></div><button class="btn" data-act="closeSheet" aria-label="Close">' + ic('x', 16) + '</button></div>';
-}
-
-function classModal(id) {
-  const c = id ? S.classes.find(function (x) { return x.id === id; }) : null;
-  sheet(sheetHead(c ? 'Edit class' : 'New class') +
-    '<div class="space-y-1"><label class="text-xs font-semibold muted">Class name</label><input id="cmName" class="inp" placeholder="e.g. Grade 7" value="' + esc(c ? c.name : '') + '"></div>' +
-    '<div class="space-y-1"><label class="text-xs font-semibold muted">Student names (paste a column from Excel/Sheets, one per line)</label><textarea id="cmNames" class="inp" rows="10" placeholder="Sok Dara&#10;Chan Sophea&#10;...">' + esc(c ? c.students.map(function (s) { return s.name; }).join('\n') : '') + '</textarea></div>' +
-    '<button class="btn btn-acc btn-lg w-full" data-act="saveClass" data-id="' + (c ? c.id : '') + '">' + ic('check', 18) + ' Save</button>');
-}
-function roundModal(cid) {
-  const n = roundsOf(cid).length + 1;
-  sheet(sheetHead('New test') +
-    '<div class="space-y-1"><label class="text-xs font-semibold muted">Test name</label><input id="rmLabel" class="inp" value="Test ' + n + '"></div>' +
-    '<div class="space-y-1"><label class="text-xs font-semibold muted">Target band for this class</label><select id="rmBand" class="inp">' + BANDS.map(function (b) { return '<option value="' + b + '"' + (b === S.settings.lastBand ? ' selected' : '') + '>Band ' + b + '</option>'; }).join('') + '</select></div>' +
-    '<div class="space-y-1"><label class="text-xs font-semibold muted">Month</label><input id="rmMonth" type="month" class="inp" value="' + monthKey() + '"></div>' +
-    '<button class="btn btn-acc btn-lg w-full" data-act="saveRound" data-id="' + cid + '">' + ic('check', 18) + ' Create test</button>');
-}
-
-const GAS = [
-  'function doPost(e) {',
-  '  var d = JSON.parse(e.postData.contents);',
-  '  var ss = SpreadsheetApp.getActiveSpreadsheet();',
-  '  var name = String(d["class"] || "Class").replace(/[\\\\\\/\\?\\*\\[\\]:]/g, "-").slice(0, 90);',
-  '  var sh = ss.getSheetByName(name) || ss.insertSheet(name);',
-  '  var head = ["Student","Test","Month","Date","Target Band","Fluency & Coherence","Lexical Resource","Grammatical Range & Accuracy","Pronunciation","Band Score","Percentage","Examiner Notes","Warm-up / Intro Qs","Part 1 Qs","Part 2 Cue Card","Part 3 Qs"];',
-  '  if (sh.getLastRow() === 0) { sh.appendRow(head); sh.setFrozenRows(1); sh.getRange(1,1,1,head.length).setFontWeight("bold"); }',
-  '  var row = [d.student,d.test,d.month,d.date,d.target,d.fc,d.lr,d.gra,d.pr,d.band,d.percent,d.notes,d.warmup,d.part1,d.part2,d.part3];',
-  '  var data = sh.getDataRange().getValues();',
-  '  for (var i = 1; i < data.length; i++) {',
-  '    if (data[i][0] === d.student && data[i][1] === d.test) { sh.getRange(i+1,1,1,row.length).setValues([row]); return ContentService.createTextOutput("ok"); }',
-  '  }',
-  '  sh.appendRow(row);',
-  '  return ContentService.createTextOutput("ok");',
-  '}'
-].join('\n');
-
-function showSettings() {
-  const s = S.settings;
-  const acc = [['#10b981', 'Green'], ['#ef4444', 'Red'], ['#3b82f6', 'Blue'], ['#a855f7', 'Purple'], ['#f59e0b', 'Amber']];
-  sheet(
-    '<div class="text-center space-y-2"><div class="flex justify-end"><button class="btn" data-act="closeSheet" aria-label="Close">' + ic('x', 16) + '</button></div>' +
-    '<img src="icon.png" data-emb="lg" alt="IST Assist" class="w-32 h-32 mx-auto rounded-2xl object-cover border-2 bb shadow-lg" /><h3 class="text-base font-bold">IST Assist</h3><p class="text-xs muted">IELTS Speaking Test Assistant</p></div>' +
-
-    '<div class="space-y-2"><span class="text-xs font-semibold muted">THEME</span><div class="grid grid-cols-3 gap-2">' +
-    [['black', 'Pure Black'], ['dark', 'Dark'], ['light', 'Light']].map(function (t) { return '<button class="btn ' + (s.theme === t[0] ? 'btn-acc' : '') + '" data-act="theme" data-v="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>' +
-    '<div class="flex items-center justify-around pt-1">' + acc.map(function (a) { return '<button aria-label="' + a[1] + ' accent" data-act="accent" data-v="' + a[0] + '" class="w-8 h-8 rounded-full" style="background:' + a[0] + ';outline:' + (s.accent === a[0] ? '2px solid var(--page-fg)' : 'none') + ';outline-offset:2px"></button>'; }).join('') + '</div></div>' +
-
-    '<div class="space-y-2"><span class="text-xs font-semibold muted">EXAMINER PIN</span><div class="text-[11px] muted">PIN is set' + (s.rec ? ', recovery code saved' : ', but no recovery code yet') + '. It is asked when entering Examiner mode and when leaving Student view. It keeps curious students out; it is not encryption.</div><div class="flex gap-2"><input id="pinNew" type="password" inputmode="numeric" maxlength="8" class="inp" placeholder="New PIN (4-8 digits)"><button class="btn btn-acc" data-act="setPin">Change</button></div><button class="btn w-full" data-act="newRec">' + ic('lock', 14) + ' Make a new recovery code</button></div>' +
-    '<div class="space-y-2"><span class="text-xs font-semibold muted">TEST TYPE</span>' +
-    '<button class="card w-full p-3 text-left ' + (s.mode === 'own' ? 'accent-border' : '') + '" style="' + (s.mode === 'own' ? 'border-color:var(--accent-color)' : '') + '" data-act="mode" data-v="own"><div class="text-sm font-semibold">My own students</div><div class="text-[11px] muted">Friendly warm-up questions (How are you today?). No ID or name questions.</div></button>' +
-    '<button class="card w-full p-3 text-left" style="' + (s.mode === 'outside' ? 'border-color:var(--accent-color)' : '') + '" data-act="mode" data-v="outside"><div class="text-sm font-semibold">Outside examiner</div><div class="text-[11px] muted">Starts with name, ID check, where you live, work or study.</div></button></div>' +
-
-    '<div class="space-y-2"><span class="text-xs font-semibold muted">TEST OPTIONS</span><div class="grid grid-cols-3 gap-2 text-center">' +
-    [['nWarm', 'Warm-up Qs', 0, 8], ['nP1', 'Part 1 Qs', 1, 12], ['nP3', 'Part 3 Qs', 1, 6]].map(function (f) { return '<div><div class="text-[10px] muted pb-1">' + f[1] + '</div><input type="number" class="inp text-center" min="' + f[2] + '" max="' + f[3] + '" value="' + s[f[0]] + '" data-chg="cfgnum" data-k="' + f[0] + '"></div>'; }).join('') + '</div>' +
-    '<div class="flex items-center justify-between gap-2"><label class="text-xs">Percentage = band ÷ <input type="number" class="inp inline-block text-center" style="width:4rem;display:inline-block" min="5" max="9" step="0.5" value="' + s.fullBand + '" data-chg="cfgnum" data-k="fullBand"> × 100</label>' +
-    '<button class="btn" data-act="testSound">' + ic('volume', 14) + ' Beep</button></div>' +
-    '<label class="flex items-center gap-2 text-xs"><input type="checkbox" ' + (s.sound ? 'checked' : '') + ' data-chg="sound"> Play beep sound at end of timers</label></div>' +
-
-    '<div class="space-y-2"><span class="text-xs font-semibold muted">QUESTION BANK</span><button class="btn w-full" data-act="bank">' + ic('book', 16) + ' Edit / add questions</button></div>' +
-
-    '<div class="space-y-2"><span class="text-xs font-semibold muted">GOOGLE SHEETS WEBHOOK</span>' +
-    '<input class="inp" placeholder="https://script.google.com/macros/s/.../exec" value="' + esc(s.webhook) + '" data-chg="webhook">' +
-    '<div class="text-[11px] muted">' + S.queue.length + ' result(s) waiting to send. Results auto-send after each test and retry when you are back online.</div>' +
-    '<div class="flex gap-2"><button class="btn flex-1" data-act="syncAll">' + ic('cloud', 14) + ' Send all results</button><button class="btn flex-1" data-act="copyGas">' + ic('copy', 14) + ' Copy script</button></div>' +
-    '<details class="text-[11px] muted"><summary class="cursor-pointer">Setup steps</summary><ol class="list-decimal pl-5 space-y-1 pt-2"><li>Open a Google Sheet &rarr; Extensions &rarr; Apps Script.</li><li>Paste the copied script, save.</li><li>Deploy &rarr; New deployment &rarr; Web app. Execute as: Me. Access: Anyone.</li><li>Copy the Web app URL into the box above.</li></ol><p class="pt-2">Each class becomes its own sheet tab; each student/test is one row (updated if you retest).</p></details></div>' +
-
-    '<div class="space-y-2"><span class="text-xs font-semibold muted">BACKUP</span><div class="flex gap-2"><button class="btn flex-1" data-act="exportData">' + ic('download', 14) + ' Export</button><label class="btn flex-1 cursor-pointer">' + ic('upload', 14) + ' Import<input type="file" accept=".json,application/json" class="hidden" data-chg="importData"></label></div>' +
-    '<button class="btn btn-danger w-full" data-act="resetAll">' + ic('trash', 14) + ' Erase all app data</button></div>' +
-    '<p class="text-center text-[10px] font-mono muted uppercase tracking-widest">Designed by REAPER-357</p>');
-}
-
-/* ---------- Question bank editor ---------- */
-let B = { kind: 'warm', band: 6 };
-function showBank() {
-  const kinds = [['warm', 'Warm-up'], ['intro', 'Intro / ID'], ['p1', 'Part 1'], ['cards', 'Part 2 + 3']];
-  const hasBand = B.kind === 'p1' || B.kind === 'cards';
-  const list = items(B.kind, B.band);
-  const act = list.filter(function (o) { return !o.hidden; }).length;
-  let h = sheetHead('Question bank', 'settings') +
-    '<div class="flex flex-wrap gap-2">' + kinds.map(function (k) { return '<button class="chip ' + (B.kind === k[0] ? 'on' : '') + '" style="font-size:12px;padding:.3rem .7rem" data-act="bankKind" data-v="' + k[0] + '">' + k[1] + '</button>'; }).join('') + '</div>';
-  if (hasBand) h += '<div class="flex flex-wrap gap-2 items-center"><span class="text-xs muted">Band</span>' + BANDS.map(function (b) { return '<button class="chip ' + (B.band === b ? 'on' : '') + '" style="font-size:12px;padding:.3rem .7rem" data-act="bankBand" data-v="' + b + '">' + b + '</button>'; }).join('') + '</div>';
-  h += '<div class="text-[11px] muted">' + act + ' active of ' + list.length + (B.kind === 'intro' ? ' · used in Outside examiner mode' : B.kind === 'warm' ? ' · used in My own students mode' : '') + '. Eye icon hides a built-in question; trash deletes your own.</div>';
-  if (B.kind === 'cards') {
-    h += '<div class="space-y-2 card p-3"><div class="text-xs font-semibold">Add a cue card (band ' + B.band + ')</div><input id="bkTopic" class="inp" placeholder="Describe a ..."><textarea id="bkBul" class="inp" rows="4" placeholder="You should say (one per line):&#10;where it is&#10;who you went with&#10;and explain why..."></textarea><textarea id="bkFol" class="inp" rows="4" placeholder="Part 3 follow-up questions (one per line)"></textarea><button class="btn btn-acc w-full" data-act="bankAdd">' + ic('plus', 14) + ' Add card</button></div>';
-  } else {
-    h += '<div class="space-y-2 card p-3"><div class="text-xs font-semibold">Add questions (one per line — paste as many as you like)</div><textarea id="bkText" class="inp" rows="4" placeholder="Type or paste questions here"></textarea><button class="btn btn-acc w-full" data-act="bankAdd">' + ic('plus', 14) + ' Add</button></div>';
-  }
-  h += '<div class="space-y-1">' + list.map(function (o, n) {
-    const txt = B.kind === 'cards' ? esc(o.x.t) + ' <span class="muted">(' + o.x.f.length + ' follow-ups)</span>' : esc(o.x);
-    return '<div class="flex items-start justify-between gap-2 py-2 border-b bb ' + (o.hidden ? 'opacity-40' : '') + '"><div class="text-xs min-w-0">' + txt + (o.builtin ? '' : ' <span class="chip on">yours</span>') + '</div><button class="btn flex-none" style="padding:.35rem .5rem" data-act="' + (o.builtin ? 'bankHide' : 'bankDel') + '" data-n="' + n + '" aria-label="' + (o.builtin ? 'Hide/show' : 'Delete') + '">' + ic(o.builtin ? (o.hidden ? 'eyeoff' : 'eye') : 'trash', 14) + '</button></div>';
+function checklist(k, title) {
+  const arr = T.q[k]; if (!arr || !arr.length) return '';
+  return '<div class="space-y-2"><div class="text-xs font-semibold accent-text uppercase tracking-widest">' + title + '</div>' + arr.map(function (q, i) {
+    return '<div class="flex items-stretch gap-2"><button class="chk' + (T.checks[k + i] ? ' done' : '') + '" data-act="chk" data-k="' + k + '" data-i="' + i + '"><span class="cb">' + ic('check', 16) + '</span><span class="qt text-base font-medium">' + esc(q) + '</span></button>' + (k === 'p3' ? '' : '<button class="btn" data-act="qswap" data-k="' + k + '" data-i="' + i + '" aria-label="Swap question">' + ic('swap', 16) + '</button>') + '</div>';
   }).join('') + '</div>';
-  sheet(h);
 }
-
-/* ============================== TEST ENGINE ============================== */
-let T = null;
-const LIST = { intro: 1, warm: 1, p1: 1, p3: 1 };
-const STEP_LABEL = { intro: 'Introduction & ID', warm: 'Warm-up (not scored)', p1: 'Part 1 · Interview', p2: 'Part 2 · Long turn', p3: 'Part 3 · Discussion', score: 'Scoring' };
-const CRIT = [['fc', 'Fluency & Coherence', 'Pace, hesitation, linking, development'], ['lr', 'Lexical Resource', 'Range, precision, paraphrase'], ['gra', 'Grammatical Range & Accuracy', 'Structures, complexity, errors'], ['pr', 'Pronunciation', 'Clarity, stress, intonation']];
-
-function startTest(sid, cid, rid) {
-  const c = S.classes.find(function (x) { return x.id === cid; }), rd = S.rounds.find(function (x) { return x.id === rid; });
-  const st = c && c.students.find(function (x) { return x.id === sid; });
-  if (!c || !rd || !st) return;
-  if (resFor(sid, rid) && !confirm('This student already has a result for ' + rd.label + '. Retesting will replace it. Continue?')) return;
-  const o = S.settings, band = rd.band, own = o.mode === 'own';
-  T = { sid: sid, cid: cid, rid: rid, name: st.name, cname: c.name, rlabel: rd.label, band: band, si: 0, qi: 0, picks: {}, card: null, p2: 0, notes: '', scores: { fc: band, lr: band, gra: band, pr: band } };
-  if (own) { if (o.nWarm > 0) T.picks.warm = pickFresh('warm', active('warm'), o.nWarm); }
-  else T.picks.intro = active('intro').slice(0, 6);
-  T.picks.p1 = pickFresh('p1_' + band, active('p1', band), o.nP1);
-  const cards = pickFresh('cards_' + band, active('cards', band), 1, function (x) { return x.t; });
-  T.card = cards[0] || null;
-  if (T.card) T.picks.p3 = T.card.f.slice(0, o.nP3);
-  T.steps = (own ? ['warm'] : ['intro']).concat(['p1'], T.card ? ['p2', 'p3'] : [], ['score']).filter(function (s) { return !LIST[s] || (T.picks[s] && T.picks[s].length); });
-  if (!T.card) toast('No Part 2 cards available for band ' + band + ' — add some in the question bank');
-  ensureAC(); wake();
-  $('#testView').classList.remove('hidden');
-  renderTest();
+function p2Panel() {
+  const c = T.card;
+  const card = '<div class="card p-5 space-y-2" style="border-color:var(--accent-color)"><div class="text-lg font-bold">' + esc(c.t) + '</div><div class="text-xs muted">You should say:</div><ul class="list-disc pl-5 text-sm space-y-1">' + c.b.map(function (b) { return '<li>' + esc(b) + '</li>'; }).join('') + '</ul></div>';
+  const timerBox = function (label) { return '<div class="card p-5 text-center space-y-3"><div class="text-xs font-semibold muted uppercase tracking-widest">' + label + '</div><div id="tmDisp" class="timer-disp">' + fmt(TM.left) + '</div><div class="h-2 rounded-full overflow-hidden" style="background:var(--bar-border)"><div id="tmBar" class="h-full accent-bg" style="width:0%"></div></div>'; };
+  if (T.p2 === 0) return '<div class="text-xs muted italic">Now I\'m going to give you a topic and I\'d like you to talk about it for one to two minutes. Before you talk, you\'ll have one minute to think about what you\'re going to say. You can make some notes if you wish.</div>' + card + '<button class="btn btn-acc btn-lg w-full" data-act="p2Prep">' + ic('play', 18) + ' Start 1-minute preparation</button>';
+  if (T.p2 === 1) return card + timerBox('Preparation time') + '<div class="flex gap-2 justify-center"><button class="btn" data-act="tmToggle">' + ic(TM.running ? 'pause' : 'play', 16) + ' ' + (TM.running ? 'Pause' : 'Resume') + '</button><button class="btn" data-act="p2Skip">Skip prep</button></div></div>';
+  if (T.p2 === 2) return card + '<div class="card p-4 text-center flash" style="border-color:var(--accent-color)"><div class="font-bold accent-text">Preparation time is up</div><div class="text-xs muted pt-1">All right? Remember, you have one to two minutes for this. Can you start speaking now, please?</div></div><button class="btn btn-acc btn-lg w-full" data-act="p2Talk">' + ic('play', 18) + ' Start 2-minute talk</button>';
+  if (T.p2 === 3) return card + timerBox('Student is speaking') + '<div class="flex gap-2 justify-center"><button class="btn" data-act="tmToggle">' + ic(TM.running ? 'pause' : 'play', 16) + ' ' + (TM.running ? 'Pause' : 'Resume') + '</button><button class="btn" data-act="p2Done">Stop early</button></div></div>';
+  return card + '<div class="card p-4 text-center flash" style="border-color:var(--accent-color)"><div class="font-bold accent-text">Time is up</div><div class="text-xs muted pt-1">Thank you. Move on to Part 3 when you are ready.</div></div>';
 }
-function closeTest() { tmStop(); unwake(); T = null; const v = $('#testView'); v.classList.remove('sv'); v.classList.add('hidden'); v.innerHTML = ''; render(); }
-function tNext() {
-  const st = T.steps[T.si];
-  if (LIST[st] && T.qi < T.picks[st].length - 1) { T.qi++; }
-  else { tmStop(); T.si = Math.min(T.si + 1, T.steps.length - 1); T.qi = 0; }
-  renderTest();
-}
-function tBack() {
-  const st = T.steps[T.si];
-  if (LIST[st] && T.qi > 0) { T.qi--; }
-  else if (T.si > 0) { tmStop(); T.si--; const ps = T.steps[T.si]; T.qi = LIST[ps] ? T.picks[ps].length - 1 : 0; if (ps === 'p2') T.p2 = 0; }
-  renderTest();
-}
-
 function renderTest() {
-  const st = T.steps[T.si], el = $('#testView');
-  const sv = !!T.sv;
-  const prog = T.steps.map(function (s, i) { return '<div class="h-1 flex-1 rounded-full" style="background:' + (i <= T.si ? 'var(--accent-color)' : 'var(--bar-border)') + '"></div>'; }).join('');
+  const el = $('#testView'), st = T.step, steps = ['ready', 'p1', 'p2', 'p3'], idx = steps.indexOf(st);
+  const label = { ready: 'Ready', p1: 'Part 1 · Interview', p2: 'Part 2 · Long turn', p3: 'Part 3 · Discussion' }[st];
+  const prog = steps.slice(1).map(function (s, i) { return '<div class="h-1 flex-1 rounded-full" style="background:' + (i + 1 <= idx ? 'var(--accent-color)' : 'var(--bar-border)') + '"></div>'; }).join('');
   let body = '', foot = '';
-  const topic = T.card ? T.card.t.replace(/^Describe\s+/i, '') : '';
-  const SCRIPT = {
-    intro: 'Good morning / afternoon. My name is ____. Could you tell me your full name, please?',
-    warm: 'Warm-up chat. This part is not scored; help the student relax.',
-    p1: 'Now, in this first part, I\'d like to ask you some questions about yourself.'
-  };
-  if (LIST[st]) {
-    const list = T.picks[st], q = list[T.qi];
-    const script = st === 'p3' ? 'We\'ve been talking about ' + topic + ' and I\'d like to discuss with you one or two more general questions related to this.' : SCRIPT[st];
-    body = '<div class="exm text-xs muted italic">' + esc(script) + '</div>' +
-      '<div class="card p-6 min-h-[12rem] flex items-center"><div class="qtext">' + esc(q) + '</div></div>' +
-      '<div class="exm text-center text-xs muted">Question ' + (T.qi + 1) + ' of ' + list.length + '</div>';
-    foot = '<button class="btn btn-lg" data-act="tBack">' + ic('back', 18) + '</button>' +
-      (st !== 'p3' && st !== 'intro' ? '<button class="exm btn btn-lg" data-act="tSwap">' + ic('swap', 18) + ' Swap</button>' : '') +
-      '<button class="btn btn-acc btn-lg flex-1" data-act="tNext">' + (T.qi < list.length - 1 ? 'Next question' : 'Continue') + ' ' + ic('next', 18) + '</button>';
+  const notes = '<details class="card p-3"><summary class="text-xs font-semibold cursor-pointer">Examiner notes (optional)</summary><textarea class="inp mt-2" rows="3" data-inp="tnotes" placeholder="Quick notes while you listen. They help the AI grade.">' + esc(T.notes) + '</textarea></details>';
+  if (st === 'ready') {
+    body = '<div class="card p-5 space-y-3 text-center"><div class="accent-text flex justify-center">' + ic('mic', 40) + '</div><div class="text-lg font-bold">' + esc(T.name) + '</div><div class="text-xs muted">' + esc(T.cname) + ' · Band ' + T.band + ' test</div><div class="text-xs muted">Friendly start: ' + T.q.friendly.length + ' · Part 1: ' + T.q.p1.length + ' · Part 2: 1 card · Part 3: ' + T.q.p3.length + '</div></div>' +
+      '<div class="text-xs muted text-center">Tapping Start test begins recording. Put the phone where it can hear both of you.</div>';
+    foot = '<button class="btn btn-lg" data-act="tCancel">Cancel</button><button class="btn btn-acc btn-lg flex-1" data-act="tBegin">' + ic('mic', 18) + ' Start test</button>';
+  } else if (st === 'p1') {
+    body = '<div class="text-xs muted italic">Good morning / afternoon. In this first part I\'d like to ask you some questions about yourself. Tick each one off as you ask it.</div>' + checklist('friendly', 'Friendly start') + checklist('p1', 'Part 1 questions') + notes;
+    foot = '<button class="btn btn-acc btn-lg flex-1" data-act="tProceed">Proceed to Part 2 ' + ic('next', 18) + '</button>';
   } else if (st === 'p2') {
-    const c = T.card;
-    const card = '<div class="card p-5 space-y-2" style="border-color:var(--accent-color)"><div class="text-lg font-bold">' + esc(c.t) + '</div><div class="text-xs muted">You should say:</div><ul class="list-disc pl-5 text-sm space-y-1">' + c.b.map(function (b) { return '<li>' + esc(b) + '</li>'; }).join('') + '</ul></div>';
-    let panel = '';
-    const timerBox = function (label) { return '<div class="card p-5 text-center space-y-3"><div class="text-xs font-semibold muted uppercase tracking-widest">' + label + '</div><div id="tmDisp" class="timer-disp">' + fmt(TM.left) + '</div><div class="h-2 rounded-full overflow-hidden" style="background:var(--bar-border)"><div id="tmBar" class="h-full accent-bg" style="width:0%"></div></div>'; };
-    if (T.p2 === 0) {
-      panel = '<div class="exm text-xs muted italic">Now I\'m going to give you a topic and I\'d like you to talk about it for one to two minutes. Before you talk, you\'ll have one minute to think about what you\'re going to say. You can make some notes if you wish. Here\'s some paper and a pencil for making notes, and here\'s your topic.</div>' + card +
-        '<button class="btn btn-acc btn-lg w-full" data-act="p2Prep">' + ic('play', 18) + ' Start 1-minute preparation</button>';
-    } else if (T.p2 === 1) {
-      panel = card + timerBox('Preparation time — student makes notes') + '<div class="flex gap-2 justify-center"><button class="btn" data-act="tmToggle">' + ic(TM.running ? 'pause' : 'play', 16) + ' ' + (TM.running ? 'Pause' : 'Resume') + '</button><button class="btn" data-act="p2Skip">Skip prep</button></div></div>';
-    } else if (T.p2 === 2) {
-      panel = card + '<div class="card p-4 text-center flash" style="border-color:var(--accent-color)"><div class="font-bold accent-text">Preparation time is up</div><div class="exm text-xs muted pt-1">All right? Remember, you have one to two minutes for this, so don\'t worry if I stop you. I\'ll tell you when the time is up. Can you start speaking now, please?</div></div>' +
-        '<button class="btn btn-acc btn-lg w-full" data-act="p2Talk">' + ic('play', 18) + ' Start 2-minute talk</button>';
-    } else if (T.p2 === 3) {
-      panel = card + timerBox('Student is speaking') + '<div class="flex gap-2 justify-center"><button class="btn" data-act="tmToggle">' + ic(TM.running ? 'pause' : 'play', 16) + ' ' + (TM.running ? 'Pause' : 'Resume') + '</button><button class="btn" data-act="p2Done">Stop early</button></div></div>';
-    } else {
-      panel = card + '<div class="card p-4 text-center flash" style="border-color:var(--accent-color)"><div class="font-bold accent-text">Time is up</div><div class="exm text-xs muted pt-1">Thank you. (Optionally ask one rounding-off question about the topic.)</div></div>';
-    }
-    body = panel;
-    foot = '<button class="btn btn-lg" data-act="tBack">' + ic('back', 18) + '</button>' + (T.p2 === 0 ? '<button class="exm btn btn-lg" data-act="tSwapCard">' + ic('swap', 18) + ' New card</button>' : '') +
-      '<button class="btn ' + (T.p2 === 4 ? 'btn-acc' : '') + ' btn-lg flex-1" data-act="tNext">Part 3 ' + ic('next', 18) + '</button>';
+    body = p2Panel() + notes;
+    foot = '<button class="btn btn-lg" data-act="tBack">' + ic('back', 18) + '</button>' + (T.p2 === 0 ? '<button class="btn btn-lg" data-act="tSwapCard">' + ic('swap', 18) + ' New card</button>' : '') + '<button class="btn btn-acc btn-lg flex-1" data-act="tProceed">Proceed to Part 3 ' + ic('next', 18) + '</button>';
   } else {
-    const band = calcBand(T.scores);
-    body = '<div class="text-xs muted">Score each criterion (0–9, half bands). Starts at the class target of ' + T.band + '.</div>' +
-      CRIT.map(function (c) { return '<div class="card p-3 flex items-center justify-between"><div class="min-w-0 pr-2"><div class="text-sm font-semibold">' + c[1] + '</div><div class="text-[11px] muted">' + c[2] + '</div></div><div class="flex items-center gap-2"><button class="btn" data-act="sc" data-k="' + c[0] + '" data-d="-0.5" aria-label="Decrease">−</button><div class="w-10 text-center text-lg font-bold">' + T.scores[c[0]].toFixed(1) + '</div><button class="btn" data-act="sc" data-k="' + c[0] + '" data-d="0.5" aria-label="Increase">+</button></div></div>'; }).join('') +
-      '<div class="card p-4 text-center" style="border-color:var(--accent-color)"><div class="text-xs muted">Overall band</div><div class="text-4xl font-extrabold accent-text">' + band.toFixed(1) + '</div><div class="text-sm font-semibold">' + pct(band) + '%</div></div>' +
-      '<textarea id="tNotes" class="inp" rows="3" placeholder="Examiner notes (optional)">' + esc(T.notes) + '</textarea>';
-    foot = '<button class="btn btn-lg" data-act="tBack">' + ic('back', 18) + '</button><button class="btn btn-acc btn-lg flex-1" data-act="saveRes">' + ic('check', 18) + ' Save result</button>';
+    body = '<div class="text-xs muted italic">We\'ve been talking about ' + esc(T.card.t.replace(/^Describe\s+/i, '')) + ' and I\'d like to discuss one or two more general questions related to this.</div>' + checklist('p3', 'Part 3 questions') + notes;
+    foot = '<button class="btn btn-lg" data-act="tBack">' + ic('back', 18) + '</button><button class="btn btn-acc btn-lg flex-1" data-act="tFinish">' + ic('check', 18) + ' Finish test</button>';
   }
-  el.classList.toggle('sv', sv);
-  if (sv && st === 'score') {
-    body = '<div class="card p-8 text-center space-y-3"><div class="text-2xl font-bold accent-text">Thank you!</div><div class="muted text-sm">Your speaking test is finished. Please wait for your examiner.</div></div>';
-    foot = '<button class="btn btn-acc btn-lg flex-1" data-act="svOff">' + ic('lock', 18) + ' Examiner: unlock</button>';
-  }
-  el.innerHTML = '<div class="border-b bb px-4 pt-3 pb-2 app-header" style="padding-top:calc(.75rem + env(safe-area-inset-top))"><div class="flex items-center justify-between gap-2"><div class="exm min-w-0"><div class="font-bold text-sm truncate">' + esc(T.name) + '</div><div class="text-[11px] muted truncate">' + esc(T.cname) + ' · ' + esc(T.rlabel) + ' · Band ' + T.band + '</div></div><div class="exm flex gap-2"><button class="btn" data-act="svOn" aria-label="Student view">' + ic('screen', 16) + '</button><button class="btn" data-act="tExit" aria-label="Exit test">' + ic('x', 16) + '</button></div><button class="stu btn ml-auto" data-act="svOff" aria-label="Examiner unlock">' + ic('lock', 16) + '</button></div><div class="flex gap-1 pt-2">' + prog + '</div><div class="text-[11px] font-semibold accent-text pt-1">' + STEP_LABEL[st] + '</div></div>' +
-    '<div class="flex-1 overflow-y-auto"><div class="max-w-2xl mx-auto w-full p-4 space-y-4">' + body + '</div></div>' +
-    '<div class="border-t bb p-3 flex gap-2 max-w-2xl mx-auto w-full" style="background:var(--nav-bg);max-width:none;padding-bottom:calc(.75rem + env(safe-area-inset-bottom))"><div class="flex gap-2 w-full max-w-2xl mx-auto">' + foot + '</div></div>';
+  const scroller = el.querySelector('[data-scroll]'), keep = scroller ? scroller.scrollTop : 0;
+  el.innerHTML = '<div class="border-b bb px-4 pb-2 app-header" style="padding-top:calc(.75rem + env(safe-area-inset-top))"><div class="flex items-center justify-between gap-2"><div class="min-w-0"><div class="font-bold text-sm truncate">' + esc(T.name) + '</div><div class="text-[11px] muted truncate">' + esc(T.cname) + ' · Band ' + T.band + '</div></div><div class="flex items-center gap-3">' + (T.rec ? '<span class="flex items-center gap-1 text-xs font-mono"><span class="rec-dot"></span><span id="recT">' + fmt(Math.floor((Date.now() - T.t0) / 1000)) + '</span></span>' : '') + '<button class="btn" data-act="tCancel" aria-label="Cancel test">' + ic('x', 16) + '</button></div></div><div class="flex gap-1 pt-2">' + prog + '</div><div class="text-[11px] font-semibold accent-text pt-1">' + label + '</div></div>' +
+    '<div class="flex-1 overflow-y-auto" data-scroll><div class="max-w-2xl mx-auto w-full p-4 space-y-4">' + body + '</div></div>' +
+    '<div class="border-t bb p-3" style="background:var(--nav-bg);padding-bottom:calc(.75rem + env(safe-area-inset-bottom))"><div class="flex gap-2 max-w-2xl mx-auto w-full">' + foot + '</div></div>';
+  const sc2 = el.querySelector('[data-scroll]'); if (sc2 && keep) sc2.scrollTop = keep;
   if (st === 'p2') tmDraw();
 }
 
-/* ============================== SYNC ============================== */
-function payload(r) {
-  const c = S.classes.find(function (x) { return x.id === r.classId; }), rd = S.rounds.find(function (x) { return x.id === r.roundId; });
-  return { 'class': c ? c.name : 'Class', student: r.studentName, test: rd ? rd.label : 'Test', month: rd ? rd.month : '', date: r.date, target: rd ? rd.band : '', fc: r.scores.fc, lr: r.scores.lr, gra: r.scores.gra, pr: r.scores.pr, band: r.band, percent: r.pct, notes: r.notes || '', warmup: (r.q.warm || r.q.intro || []).join(' | '), part1: (r.q.p1 || []).join(' | '), part2: r.q.card || '', part3: (r.q.p3 || []).join(' | ') };
+async function tBeginAsync() {
+  ensureAC();
+  const a = S.settings.audio;
+  if (a.mode === 'folder' && !isNative()) { try { const h = await kvGet('dir'); if (h && h.requestPermission) await h.requestPermission({ mode: 'readwrite' }); } catch (e) {} }
+  try { await recStart(); } catch (e) { if (!confirm('Could not start recording (' + ((e && e.message) || e) + '). Run the test without audio?')) return; T.rec = null; }
+  wake(); T.t0 = Date.now(); T.step = 'p1';
+  T.recIv = setInterval(function () { const e = $('#recT'); if (e && T) e.textContent = fmt(Math.floor((Date.now() - T.t0) / 1000)); }, 1000);
+  renderTest();
 }
+async function finishTest() {
+  if (!confirm('Finish the test and stop recording?')) return;
+  tmStop();
+  const blob = await recStop(), tt = T;
+  const same = S.tests.filter(function (x) { return x.studentId === tt.sid && x.date === today(); }).length;
+  const t = newTestRec({ classId: tt.cid, studentId: tt.sid, studentName: tt.name, className: tt.cname, date: today(), time: hhmm(), target: tt.band, dur: Math.round((Date.now() - tt.t0) / 1000),
+    scores: { fc: tt.band, lr: tt.band, gra: tt.band, pr: tt.band }, notes: tt.notes, dup: same,
+    q: { friendly: tt.q.friendly.slice(), p1: tt.q.p1.slice(), card: tt.card, p3: tt.q.p3.slice() } }, S.settings.fullBand);
+  if (blob && blob.size > 0) {
+    try { await audioPut(t.id, blob); t.audio = { ext: extOf(blob.type), mime: blob.type, size: blob.size }; } catch (e) { toast('Could not store the recording in the app.'); }
+  }
+  S.tests.push(t); save();
+  const cid = tt.cid, sid = tt.sid, id = t.id;
+  closeTest();
+  go('result', { testId: id, classId: cid, studentId: sid });
+  if (blob && blob.size > 0 && S.settings.audio.mode !== 'app') {
+    exportAudio(t, blob, false).then(function (p) { if (p) { t.audioFile = p; save(); toast('Audio: ' + p); patchResult(t.id); } });
+  }
+  if (S.settings.ai.auto) autoPipeline(id);
+}
+
+/* ============================== AUDIO EXPORT ============================== */
+async function exportAudio(t, blob, force) {
+  const a = S.settings.audio, ext = (t.audio && t.audio.ext) || 'webm';
+  const n = S.tests.filter(function (x) { return x.studentId === t.studentId && x.date === t.date && x.created < t.created; }).length;
+  const fname = safe(t.studentName) + '-' + t.date + (n ? '-' + (n + 1) : '') + '.' + ext, grade = safe(t.className);
+  const dlName = 'IST_' + grade + '_' + fname;
+  try {
+    if (!force && a.mode === 'folder') {
+      if (isNative()) {
+        const FS = window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.Filesystem;
+        if (!FS) throw new Error('Filesystem plugin missing');
+        await FS.writeFile({ path: 'Music/IST/' + grade + '/' + fname, data: await blobToB64(blob), directory: 'EXTERNAL_STORAGE', recursive: true });
+        return 'Music/IST/' + grade + '/' + fname;
+      }
+      const root = await kvGet('dir');
+      if (root && root.getDirectoryHandle) {
+        const sub = await root.getDirectoryHandle(grade, { create: true }), fh = await sub.getFileHandle(fname, { create: true }), w = await fh.createWritable();
+        await w.write(blob); await w.close(); return root.name + '/' + grade + '/' + fname;
+      }
+    }
+    download(dlName, blob); return 'Downloads/' + dlName;
+  } catch (e) {
+    try { download(dlName, blob); } catch (x) {}
+    return 'Downloads/' + dlName + ' (folder save failed: ' + ((e && e.message) || e) + ')';
+  }
+}
+
+/* ============================== RESULTS ============================== */
+const CRIT = [
+  ['fc', 'Fluency & Coherence', 'Pace, hesitation, linking, developing ideas', [
+    ['9', 'Speaks fluently with only rare hesitation; ideas fully developed and coherent.'],
+    ['8', 'Fluent, occasional hesitation or repetition; develops topics appropriately.'],
+    ['7', 'Speaks at length without effort; some hesitation; uses a range of linking words flexibly.'],
+    ['6', 'Willing to speak at length, but loses coherence at times; some hesitation and self-correction.'],
+    ['5', 'Keeps going but relies on repetition, self-correction or slow speech; simple linking overused.'],
+    ['4', 'Noticeable pauses; slow, repeats; links simple sentences with basic connectors.'],
+    ['≤3', 'Long pauses; very short answers; hardly any linking.']]],
+  ['lr', 'Lexical Resource', 'Range, precision, paraphrase', [
+    ['9', 'Precise, natural, flexible vocabulary; idiomatic language used well.'],
+    ['8', 'Wide range; uncommon words used with some imprecision; paraphrases well.'],
+    ['7', 'Flexible vocabulary, some less common or idiomatic items; occasional wrong choices.'],
+    ['6', 'Wide enough to discuss topics at length; some wrong word choices but meaning clear.'],
+    ['5', 'Manages familiar topics; limited flexibility; paraphrase attempts with mixed success.'],
+    ['4', 'Basic meaning on familiar topics only; frequent word-choice errors; little paraphrase.'],
+    ['≤3', 'Isolated words and memorised phrases only.']]],
+  ['gra', 'Grammatical Range & Accuracy', 'Variety of structures, accuracy', [
+    ['9', 'Full range of structures used naturally; only rare slips.'],
+    ['8', 'Wide range; majority of sentences error-free; occasional slips.'],
+    ['7', 'Range of complex structures with some flexibility; often error-free, some errors persist.'],
+    ['6', 'Mix of simple and complex; errors in complex forms but meaning rarely lost.'],
+    ['5', 'Basic forms fairly well; limited complex forms, usually with errors.'],
+    ['4', 'Mostly basic sentences; few subordinate clauses; frequent errors that can cause confusion.'],
+    ['≤3', 'Very few structures; memorised phrases.']]],
+  ['pr', 'Pronunciation', 'Clarity, stress, intonation (listen to the recording)', [
+    ['9', 'Full range of features, effortless to understand.'],
+    ['8', 'Wide range of features; easy to understand throughout; occasional slips.'],
+    ['7', 'Shows features of 6 and some of 8; clear overall.'],
+    ['6', 'Range of features with mixed control; some mispronunciation but generally understood.'],
+    ['5', 'Shows some features of 4 and 6; mispronunciation can strain the listener.'],
+    ['4', 'Limited range; mispronunciation often causes difficulty.'],
+    ['≤3', 'Frequently unintelligible.']]]
+];
+var PROG = {};
+function pgText(t) {
+  const p = PROG[t.id] || {}, a = S.settings.ai;
+  if (p.busy) return '<span class="accent-text">' + esc(p.msg || 'Working…') + '</span>';
+  if (p.err) return '<span style="color:#f87171">' + esc(p.err) + '</span>';
+  if (!t.audio && !t.transcript) return 'No recording or transcript yet. Type or paste a transcript to use AI grading.';
+  if (a.provider === 'none') return 'AI grading is not set up (Settings → AI grading). You can grade by hand below.';
+  if (t.ai) return 'AI scores and feedback were drafted. Check them and edit anything.';
+  return t.transcript ? 'Ready to grade.' : 'Ready to transcribe.';
+}
+function pgBtns(t) {
+  const p = PROG[t.id] || {}, a = S.settings.ai; if (p.busy) return '';
+  let h = '';
+  if (t.audio && a.stt === 'whisper') h += '<button class="btn" data-act="aiStt" data-id="' + t.id + '">' + ic('mic', 14) + ' ' + (t.transcript ? 'Transcribe again' : 'Transcribe') + '</button>';
+  if (a.provider !== 'none') h += '<button class="btn btn-acc" data-act="aiGrade" data-id="' + t.id + '">' + ic('spark', 14) + ' ' + (t.ai ? 'Grade again' : 'Grade with AI') + '</button>';
+  if (a.provider === 'none' || a.stt !== 'whisper') h += '<button class="btn" data-act="settings">' + ic('gear', 14) + ' AI settings</button>';
+  return h;
+}
+function aiLine(t, k) {
+  if (!t.ai) return '';
+  if (k === 'pr') return 'Pronunciation can\'t be judged from text. Listen to the recording and set this yourself.';
+  return 'AI suggested ' + t.ai[k].toFixed(1) + (t.ai.reasons && t.ai.reasons[k] ? ' — ' + esc(t.ai.reasons[k]) : '');
+}
+function viewResult(t) {
+  let h = '<div class="flex items-center justify-between gap-2">' + backBtn('Back') + '<span id="saveBadge" class="chip ' + (t.saved ? 'on' : '') + '">' + (t.saved ? 'Saved' : 'Unsaved') + '</span></div>' +
+    '<div><h2 class="text-lg font-bold">' + esc(t.studentName) + '</h2><div class="text-[11px] muted">' + esc(t.className) + ' · ' + esc(t.date) + (t.time ? ' ' + esc(t.time) : '') + ' · Target band ' + t.target + '</div></div>';
+  h += '<div class="card p-3 space-y-2"><div class="text-xs font-semibold">Recording</div>' + (t.audio ? '<audio id="audioEl" controls class="w-full"></audio><button class="btn w-full" data-act="saveAudio" data-id="' + t.id + '">' + ic('download', 14) + ' Save audio file</button><div id="audFile" class="text-[11px] muted">' + esc(t.audioFile) + '</div>' : '<div class="text-xs muted">No recording for this test.</div>') + '</div>';
+  h += '<div class="card p-3 space-y-2"><div class="text-xs font-semibold accent-text">' + ic('spark', 14) + ' AI assistant</div><div id="pgMsg" class="text-xs muted">' + pgText(t) + '</div><div id="pgBtns" class="flex flex-wrap gap-2">' + pgBtns(t) + '</div></div>';
+  h += '<div class="space-y-1"><label class="text-xs font-semibold muted">Transcript (examiner and student mixed; edit freely)</label><textarea id="tr" class="inp" rows="5" data-inp="transcript" placeholder="Paste or type what was said, or let the AI transcribe the recording.">' + esc(t.transcript) + '</textarea></div>';
+  CRIT.forEach(function (c) {
+    const k = c[0];
+    h += '<div class="card p-3 space-y-2"><div class="flex items-center justify-between gap-2"><div class="min-w-0"><div class="text-sm font-semibold">' + c[1] + '</div><div class="text-[11px] muted">' + c[2] + '</div></div><div class="flex items-center gap-2"><button class="btn" data-act="sc" data-k="' + k + '" data-d="-0.5" aria-label="Decrease">−</button><div id="sc_' + k + '" class="w-10 text-center text-lg font-bold">' + t.scores[k].toFixed(1) + '</div><button class="btn" data-act="sc" data-k="' + k + '" data-d="0.5" aria-label="Increase">+</button></div></div>' +
+      '<div id="ai_' + k + '" class="text-[11px] muted">' + aiLine(t, k) + '</div><details class="text-[11px]"><summary class="cursor-pointer muted">' + ic('info', 12) + ' What each band looks like</summary><div class="pt-2 space-y-1">' + c[3].map(function (r) { return '<div><b>' + r[0] + '</b> ' + esc(r[1]) + '</div>'; }).join('') + '</div></details></div>';
+  });
+  h += '<div class="card p-4 text-center" style="border-color:var(--accent-color)"><div class="text-xs muted">Overall band (average of the four, rounded to the nearest half)</div><div id="ov_band" class="text-4xl font-extrabold accent-text">' + t.band.toFixed(1) + '</div><div id="ov_pct" class="text-sm font-semibold">' + t.pct + '%</div></div>';
+  h += '<div class="space-y-1"><label class="text-xs font-semibold muted">Feedback for the student</label><textarea id="fb" class="inp" rows="6" data-inp="feedback">' + esc(t.feedback) + '</textarea></div>' +
+    '<div class="space-y-1"><label class="text-xs font-semibold muted">Follow-up response (next steps)</label><textarea id="fu" class="inp" rows="5" data-inp="followup">' + esc(t.followup) + '</textarea></div>' +
+    '<div class="space-y-1"><label class="text-xs font-semibold muted">Examiner notes</label><textarea id="nt" class="inp" rows="3" data-inp="notes">' + esc(t.notes) + '</textarea></div>' +
+    '<button class="btn btn-acc btn-lg w-full" data-act="saveRes" data-id="' + t.id + '">' + ic('save', 18) + ' Save result</button>' +
+    '<div class="grid grid-cols-2 gap-2"><button class="btn btn-lg" data-act="share" data-id="' + t.id + '">' + ic('share', 18) + ' Share PNG</button><button class="btn btn-lg btn-danger" data-act="delTest" data-id="' + t.id + '">' + ic('trash', 18) + ' Delete</button></div>';
+  return h;
+}
+function setVal(sel, v) { const e = $(sel); if (e && document.activeElement !== e) e.value = v; }
+function patchScores(t) {
+  CRIT.forEach(function (c) { const e = $('#sc_' + c[0]); if (e) e.textContent = t.scores[c[0]].toFixed(1); const a = $('#ai_' + c[0]); if (a) a.innerHTML = aiLine(t, c[0]); });
+  const b = $('#ov_band'); if (b) b.textContent = t.band.toFixed(1);
+  const p = $('#ov_pct'); if (p) p.textContent = t.pct + '%';
+}
+function setBadge(t) { const e = $('#saveBadge'); if (e) { e.textContent = t.saved ? 'Saved' : 'Unsaved'; e.classList.toggle('on', !!t.saved); } }
+function patchResult(id) {
+  if (V.name !== 'result' || V.testId !== id) return;
+  const t = S.tests.find(function (x) { return x.id === id; }); if (!t) return;
+  const m = $('#pgMsg'); if (m) m.innerHTML = pgText(t);
+  const b = $('#pgBtns'); if (b) b.innerHTML = pgBtns(t);
+  setVal('#tr', t.transcript); setVal('#fb', t.feedback); setVal('#fu', t.followup);
+  const af = $('#audFile'); if (af) af.textContent = t.audioFile || '';
+  patchScores(t); setBadge(t);
+}
+function markDirty(t) { t.saved = false; setBadge(t); saveSoon(); }
+
+/* ---------- Share as PNG ---------- */
+function makePng(t) {
+  const W = 1080, M = 64, acc = S.settings.accent || '#10b981';
+  const c = document.createElement('canvas'); c.width = W; c.height = 400; const g = c.getContext('2d');
+  function wrap(text, font, maxW) {
+    g.font = font; const out = [];
+    String(text || '').split('\n').forEach(function (p) {
+      if (!p.trim()) { out.push(''); return; }
+      let line = '';
+      p.split(/\s+/).forEach(function (w) { const test = line ? line + ' ' + w : w; if (g.measureText(test).width > maxW && line) { out.push(line); line = w; } else line = test; });
+      out.push(line);
+    });
+    return out;
+  }
+  function paint(draw) {
+    let y = 100;
+    const txt = function (s, font, color, x, align) { if (!draw) return; g.font = font; g.fillStyle = color; g.textAlign = align || 'left'; g.fillText(s, x == null ? M : x, y); };
+    if (draw) { g.fillStyle = '#ffffff'; g.fillRect(0, 0, W, c.height); g.fillStyle = acc; g.fillRect(0, 0, W, 28); }
+    txt('IELTS Speaking Test', '700 40px sans-serif', '#111827'); y += 52;
+    txt('Result and feedback', '400 28px sans-serif', '#6b7280'); y += 84;
+    txt(t.studentName, '700 54px sans-serif', '#111827'); y += 46;
+    txt(t.className + '  ·  ' + t.date + '  ·  Target band ' + t.target, '400 28px sans-serif', '#6b7280'); y += 36;
+    if (draw) { g.fillStyle = '#f3f4f6'; g.fillRect(M, y, W - 2 * M, 190); }
+    y += 128; txt('Band ' + t.band.toFixed(1), '800 96px sans-serif', acc, M + 32);
+    txt(t.pct + '%', '800 72px sans-serif', '#111827', W - M - 32, 'right'); y += 90;
+    CRIT.forEach(function (cr) {
+      txt(cr[1], '600 30px sans-serif', '#111827'); txt(t.scores[cr[0]].toFixed(1), '700 34px sans-serif', '#111827', W - M, 'right'); y += 24;
+      if (draw) { g.fillStyle = '#e5e7eb'; g.fillRect(M, y, W - 2 * M, 14); g.fillStyle = acc; g.fillRect(M, y, (W - 2 * M) * Math.min(1, t.scores[cr[0]] / 9), 14); }
+      y += 62;
+    });
+    [['Feedback', t.feedback], ['Follow-up', t.followup]].forEach(function (sec) {
+      if (!String(sec[1] || '').trim()) return;
+      y += 14; txt(sec[0], '700 34px sans-serif', acc); y += 20;
+      wrap(sec[1], '400 28px sans-serif', W - 2 * M).forEach(function (l) { y += 42; txt(l, '400 28px sans-serif', '#1f2937'); });
+      y += 20;
+    });
+    y += 40; txt('Made with IST Assist', '400 22px sans-serif', '#9ca3af', M);
+    return y;
+  }
+  const H = paint(false) + M; c.height = H; paint(true);
+  return new Promise(function (res) { c.toBlob(res, 'image/png'); });
+}
+async function shareResult(t) {
+  const blob = await makePng(t); if (!blob) { toast('Could not make the image'); return; }
+  const name = 'IST-' + safe(t.studentName) + '-' + t.date + '.png';
+  try {
+    const file = new File([blob], name, { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'IELTS speaking result' }); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  download(name, blob); toast('Image saved: ' + name);
+}
+
+/* ============================== AI (transcribe + grade) ============================== */
+let WK = null;
+function getWorker() {
+  if (WK) return WK;
+  const code = "import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3';\nenv.allowLocalModels = false;\nlet asr = null, cur = '';\nself.onmessage = async (e) => {\n  const m = e.data;\n  try {\n    if (m.type !== 'run') return;\n    if (!asr || cur !== m.model) { asr = await pipeline('automatic-speech-recognition', m.model, { progress_callback: (p) => self.postMessage({ type: 'progress', p: p }) }); cur = m.model; }\n    const out = await asr(m.audio, { chunk_length_s: 30, stride_length_s: 5 });\n    self.postMessage({ type: 'done', text: (out && out.text) || '' });\n  } catch (err) { self.postMessage({ type: 'error', error: String((err && err.message) || err) }); }\n};";
+  WK = new Worker(URL.createObjectURL(new Blob([code], { type: 'text/javascript' })), { type: 'module' });
+  return WK;
+}
+function setProg(id, o) { PROG[id] = Object.assign({}, PROG[id] || {}, o); if (V.name === 'result' && V.testId === id) { const m = $('#pgMsg'); if (m) m.innerHTML = pgText(S.tests.find(function (x) { return x.id === id; })); } }
+async function transcribe(t) {
+  const blob = await audioGet(t.id); if (!blob) throw new Error('No recording found for this test.');
+  setProg(t.id, { msg: 'Preparing audio…' });
+  const AC2 = window.AudioContext || window.webkitAudioContext;
+  const ctx = new AC2({ sampleRate: 16000 });
+  let buf; try { buf = await ctx.decodeAudioData(await blob.arrayBuffer()); } catch (e) { throw new Error('This browser could not read the recording for transcription.'); }
+  try { ctx.close(); } catch (e) {}
+  const f32 = new Float32Array(buf.getChannelData(0));
+  return new Promise(function (res, rej) {
+    let w; try { w = getWorker(); } catch (e) { rej(new Error('On-device transcription is not supported in this browser.')); return; }
+    w.onmessage = function (ev) {
+      const m = ev.data;
+      if (m.type === 'progress') { const p = m.p || {}; if (p.status === 'progress' && p.progress != null) setProg(t.id, { msg: 'Downloading speech model… ' + Math.round(p.progress) + '%' }); else if (p.status === 'ready') setProg(t.id, { msg: 'Transcribing… this can take a few minutes' }); }
+      else if (m.type === 'done') res(m.text); else if (m.type === 'error') rej(new Error(m.error));
+    };
+    w.onerror = function () { WK = null; rej(new Error('Could not start the speech model. It needs internet the first time.')); };
+    setProg(t.id, { msg: 'Loading speech model (first time downloads about 80 MB)…' });
+    w.postMessage({ type: 'run', model: S.settings.ai.sttModel, audio: f32 }, [f32.buffer]);
+  });
+}
+async function llm(system, user) {
+  const a = S.settings.ai;
+  try {
+    if (a.provider === 'anthropic') {
+      if (!a.key) throw new Error('Add your Anthropic API key in Settings → AI grading.');
+      const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'content-type': 'application/json', 'x-api-key': a.key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' }, body: JSON.stringify({ model: a.model || 'claude-sonnet-5-5', max_tokens: 1800, system: system, messages: [{ role: 'user', content: user }] }) });
+      if (!r.ok) throw new Error('AI error ' + r.status + ': ' + (await r.text()).slice(0, 180));
+      const j = await r.json(); return (j.content || []).map(function (c) { return c.text || ''; }).join('');
+    }
+    if (a.provider === 'openai') {
+      const base = String(a.base || '').replace(/\/+$/, ''); if (!base) throw new Error('Add the server address in Settings → AI grading.');
+      const hd = { 'content-type': 'application/json' }; if (a.key) hd.Authorization = 'Bearer ' + a.key;
+      const r = await fetch(base + '/chat/completions', { method: 'POST', headers: hd, body: JSON.stringify({ model: a.model, temperature: 0.2, messages: [{ role: 'system', content: system }, { role: 'user', content: user }] }) });
+      if (!r.ok) throw new Error('AI error ' + r.status + ': ' + (await r.text()).slice(0, 180));
+      const j = await r.json(); return (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '';
+    }
+  } catch (e) { if (e instanceof TypeError) throw new Error('Could not reach the AI service. Check your internet or the server address.'); throw e; }
+  throw new Error('Pick an AI provider in Settings → AI grading.');
+}
+function buildPrompt(t) {
+  const q = t.q || {}, L = [];
+  L.push('Target band for this class: ' + t.target + '. The student is a non-native school learner.');
+  L.push('Questions the examiner asked:');
+  (q.friendly || []).concat(q.p1 || []).forEach(function (x) { L.push('- Part 1: ' + x); });
+  if (q.card) { L.push('- Part 2 cue card: ' + q.card.t + ' (' + (q.card.b || []).join('; ') + ')'); }
+  (q.p3 || []).forEach(function (x) { L.push('- Part 3: ' + x); });
+  if (t.notes) L.push('Examiner notes: ' + t.notes);
+  L.push('Transcript (examiner and student mixed, no speaker labels):'); L.push(t.transcript);
+  const sys = 'You are an experienced IELTS Speaking examiner helping a classroom teacher grade a monthly speaking test. Use the four IELTS Speaking criteria: Fluency and Coherence (fc), Lexical Resource (lr), Grammatical Range and Accuracy (gra) and Pronunciation (pr). Scores are bands from 0 to 9 in steps of 0.5. The transcript comes from automatic speech recognition of a recording that contains BOTH the examiner and the student, without speaker labels, and it may contain recognition errors. Judge only the student\'s speech, and do not penalise likely transcription mistakes. Pronunciation cannot be judged reliably from text, so set pr to null. Be fair and realistic, not generous. Reply with ONE JSON object and nothing else, in this shape: {"fc":6.0,"lr":6.0,"gra":5.5,"pr":null,"reasons":{"fc":"one sentence","lr":"one sentence","gra":"one sentence"},"feedback":"...","followup":"..."}. "feedback" is 4 to 6 sentences written directly to the student in simple, encouraging English: first strengths, then the two most useful things to improve, quoting a short example from their own speech where possible. "followup" is 3 to 5 short lines, each starting with "- ", written to the student: practice tasks for the next month, with one or two model improved sentences.';
+  return { sys: sys, user: L.join('\n') };
+}
+function applyAI(t, r, overwrite) {
+  const q = function (x) { x = parseFloat(x); return isNaN(x) ? null : Math.max(0, Math.min(9, Math.round(x * 2) / 2)); };
+  const fc = q(r.fc), lr = q(r.lr), gra = q(r.gra), pr = q(r.pr);
+  if (fc == null || lr == null || gra == null) throw new Error('The AI reply did not include scores. Try again.');
+  t.ai = { fc: fc, lr: lr, gra: gra, pr: pr, reasons: r.reasons || {} };
+  if (overwrite || !t.edited) { t.scores = { fc: fc, lr: lr, gra: gra, pr: pr != null ? pr : Math.round((fc + lr + gra) / 3 * 2) / 2 }; t.edited = false; }
+  if (r.feedback && (overwrite || !t.feedback || !t.fbEdited)) t.feedback = String(r.feedback).trim();
+  if (r.followup && (overwrite || !t.followup || !t.fbEdited)) t.followup = Array.isArray(r.followup) ? r.followup.map(function (x) { return '- ' + String(x).replace(/^-\s*/, ''); }).join('\n') : String(r.followup).trim();
+  if (overwrite) t.fbEdited = false;
+  recalcT(t); t.saved = false;
+}
+async function doStt(id) {
+  const t = S.tests.find(function (x) { return x.id === id; }); if (!t) return;
+  setProg(id, { busy: true, err: '', msg: 'Starting…' });
+  try { t.transcript = (await transcribe(t)).trim(); recalcT(t); t.saved = false; save(); setProg(id, { busy: false, err: '', msg: '' }); }
+  catch (e) { setProg(id, { busy: false, err: (e && e.message) || String(e) }); }
+  patchResult(id);
+}
+async function doGrade(id, overwrite) {
+  const t = S.tests.find(function (x) { return x.id === id; }); if (!t) return;
+  if (!String(t.transcript || '').trim()) { setProg(id, { err: 'There is no transcript to grade yet. Transcribe the recording or type one in.' }); patchResult(id); return; }
+  setProg(id, { busy: true, err: '', msg: 'Grading with AI…' });
+  try {
+    const p = buildPrompt(t), txt = await llm(p.sys, p.user), m = txt.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('The AI reply was not in the expected format. Try again.');
+    let r; try { r = JSON.parse(m[0]); } catch (e) { throw new Error('The AI reply could not be read. Try again.'); }
+    applyAI(t, r, overwrite); save(); setProg(id, { busy: false, err: '', msg: '' });
+  } catch (e) { setProg(id, { busy: false, err: (e && e.message) || String(e) }); }
+  patchResult(id);
+}
+async function autoPipeline(id) {
+  const t = S.tests.find(function (x) { return x.id === id; }); if (!t) return;
+  const a = S.settings.ai;
+  if (!t.transcript && t.audio && a.stt === 'whisper') await doStt(id);
+  const t2 = S.tests.find(function (x) { return x.id === id; });
+  if (t2 && t2.transcript && a.provider !== 'none' && !t2.ai) await doGrade(id, false);
+}
+
+/* ============================== WEBHOOK (Google Sheets) ============================== */
+function payload(t) { return { id: t.id, student: t.studentName, 'class': t.className, date: t.date, target: t.target, fc: t.scores.fc, lr: t.scores.lr, gra: t.scores.gra, pr: t.scores.pr, band: t.band, percent: t.pct, feedback: t.feedback, followup: t.followup, notes: t.notes }; }
 let flushing = false;
 async function flush() {
-  if (flushing || !S.settings.webhook || !navigator.onLine) return;
+  if (flushing || !navigator.onLine) return;
   flushing = true;
   try {
     while (S.queue.length) {
-      const r = S.results.find(function (x) { return x.id === S.queue[0]; });
-      if (r) await fetch(S.settings.webhook, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload(r)) });
+      const t = S.tests.find(function (x) { return x.id === S.queue[0]; });
+      const c = t && S.classes.find(function (x) { return x.id === t.classId; });
+      if (t && c && c.webhook) await fetch(c.webhook, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload(t)) });
       S.queue.shift(); save();
     }
   } catch (e) {}
   flushing = false;
 }
 function queueIds(ids) { ids.forEach(function (id) { if (S.queue.indexOf(id) < 0) S.queue.push(id); }); save(); flush(); }
+const GAS = [
+  'function doPost(e) {',
+  '  var d = JSON.parse(e.postData.contents);',
+  '  var ss = SpreadsheetApp.getActiveSpreadsheet();',
+  '  var name = String(d.student || "Student").replace(/[\\\\\\/\\?\\*\\[\\]:]/g, "-").slice(0, 90);',
+  '  var sh = ss.getSheetByName(name) || ss.insertSheet(name);',
+  '  var head = ["Test ID","Date","Class","Target Band","Fluency & Coherence","Lexical Resource","Grammatical Range & Accuracy","Pronunciation","Band Score","Percentage","Feedback","Follow-up response","Examiner Notes"];',
+  '  if (sh.getLastRow() === 0) { sh.appendRow(head); sh.setFrozenRows(1); sh.getRange(1,1,1,head.length).setFontWeight("bold"); }',
+  '  var row = [d.id,d.date,d["class"],d.target,d.fc,d.lr,d.gra,d.pr,d.band,d.percent,d.feedback,d.followup,d.notes];',
+  '  var data = sh.getDataRange().getValues();',
+  '  for (var i = 1; i < data.length; i++) {',
+  '    if (String(data[i][0]) === String(d.id)) { sh.getRange(i+1,1,1,row.length).setValues([row]); return ContentService.createTextOutput("ok"); }',
+  '  }',
+  '  sh.appendRow(row);',
+  '  return ContentService.createTextOutput("ok");',
+  '}'
+].join('\n');
+
+/* ============================== SETTINGS VIEW ============================== */
+function viewSettings() {
+  const s = S.settings, a = s.ai, au = s.audio;
+  const sel = function (path, val, opts) { return '<select class="inp" data-chg="set" data-p="' + path + '">' + opts.map(function (o) { return '<option value="' + esc(o[0]) + '"' + (String(val) === String(o[0]) ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('') + '</select>'; };
+  const num = function (path, val, mn, mx, step) { return '<input type="number" class="inp text-center" min="' + mn + '" max="' + mx + '" step="' + (step || 1) + '" data-chg="set" data-p="' + path + '" value="' + val + '">'; };
+  const txt = function (path, val, ph, type) { return '<input type="' + (type || 'text') + '" class="inp" autocomplete="off" data-chg="set" data-p="' + path + '" value="' + esc(val) + '" placeholder="' + esc(ph || '') + '">'; };
+  const sec = function (title, body) { return '<div class="card p-4 space-y-3"><div class="text-xs font-semibold muted uppercase tracking-widest">' + title + '</div>' + body + '</div>'; };
+  const lab = function (t) { return '<div class="text-[11px] muted pb-1">' + t + '</div>'; };
+  const acc = [['#10b981', 'Green'], ['#ef4444', 'Red'], ['#3b82f6', 'Blue'], ['#a855f7', 'Purple'], ['#f59e0b', 'Amber']];
+  let h = backBtn('Back') + '<div class="text-center space-y-2"><img src="icon.png" data-emb="lg" alt="IST Assist" class="w-32 h-32 mx-auto rounded-2xl object-cover border-2 bb shadow-lg" /><h3 class="text-base font-bold">IST Assist</h3><p class="text-xs muted">IELTS Speaking Test Assistant</p></div>';
+  h += sec('Appearance', '<div class="grid grid-cols-3 gap-2">' + [['black', 'Pure Black'], ['dark', 'Dark'], ['light', 'Light']].map(function (t) { return '<button class="btn ' + (s.theme === t[0] ? 'btn-acc' : '') + '" data-act="theme" data-v="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div><div class="flex items-center justify-around pt-1">' + acc.map(function (c) { return '<button aria-label="' + c[1] + ' accent" data-act="accent" data-v="' + c[0] + '" class="w-8 h-8 rounded-full" style="background:' + c[0] + ';outline:' + (s.accent === c[0] ? '2px solid var(--page-fg)' : 'none') + ';outline-offset:2px"></button>'; }).join('') + '</div>');
+  h += sec('Test options', '<div class="grid grid-cols-3 gap-2 text-center"><div>' + lab('Friendly Qs') + num('nFriendly', s.nFriendly, 0, 8) + '</div><div>' + lab('Part 1 Qs') + num('nP1', s.nP1, 1, 12) + '</div><div>' + lab('Part 3 Qs') + num('nP3', s.nP3, 1, 6) + '</div></div><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2 text-xs">Percentage = band ÷<div style="width:4.5rem">' + num('fullBand', s.fullBand, 5, 9, 0.5) + '</div>× 100</div><button class="btn" data-act="testSound">' + ic('volume', 14) + ' Beep</button></div><label class="flex items-center gap-2 text-xs"><input type="checkbox" data-chg="set" data-p="sound" ' + (s.sound ? 'checked' : '') + '> Beep when the 1-minute and 2-minute timers end</label>');
+  h += sec('Recording', lab('After each test, the recording is always kept inside the app. Also:') + sel('audio.mode', au.mode, [['app', 'Keep in the app only'], ['download', 'Download a file'], ['folder', 'Save to folder: Music/IST/Grade (Android app) or a folder I choose']]) +
+    '<div class="flex items-center justify-between gap-2"><div class="text-xs muted">Folder: <span id="dirName">…</span></div><button class="btn" data-act="pickDir">' + ic('folder', 14) + ' Choose folder</button></div>' +
+    '<div class="text-[11px] muted">Choosing a folder works in desktop Chrome and Edge. A web page on Android can\'t write straight into Music/IST, so downloads land in Downloads; the Android app wrapper can save to Music/IST/Grade.</div>' +
+    lab('Quality (smaller = lighter files)') + sel('audio.kbps', au.kbps, [[16, '16 kbps (smallest)'], [24, '24 kbps (recommended)'], [32, '32 kbps'], [48, '48 kbps (best)']]) +
+    '<div class="text-[11px] muted">Files are Opus audio (.webm or .ogg; .m4a on Apple devices). MP3 isn\'t available from the browser recorder.</div>');
+  h += sec('AI grading', lab('Speech to text') + sel('ai.stt', a.stt, [['whisper', 'On-device Whisper (private, downloads a model once)'], ['off', 'Off (I type or paste the transcript)']]) +
+    (a.stt === 'whisper' ? sel('ai.sttModel', a.sttModel, [['Xenova/whisper-tiny.en', 'Tiny (about 40 MB, fastest)'], ['Xenova/whisper-base.en', 'Base (about 80 MB, recommended)'], ['Xenova/whisper-small.en', 'Small (about 250 MB, most accurate)']]) : '') +
+    lab('Grader') + sel('ai.provider', a.provider, [['none', 'None (grade by hand)'], ['anthropic', 'Anthropic Claude (API key)'], ['openai', 'OpenAI-compatible server (Ollama, LM Studio…)']]) +
+    (a.provider === 'anthropic' ? lab('API key (stored only in this browser)') + txt('ai.key', a.key, 'sk-ant-…', 'password') + lab('Model') + txt('ai.model', a.model, 'claude-sonnet-5-5') : '') +
+    (a.provider === 'openai' ? lab('Server address') + txt('ai.base', a.base, 'http://localhost:11434/v1') + lab('Model name') + txt('ai.model', a.model, 'e.g. llama3.1') + lab('API key (optional)') + txt('ai.key', a.key, '', 'password') : '') +
+    '<label class="flex items-center gap-2 text-xs"><input type="checkbox" data-chg="set" data-p="ai.auto" ' + (a.auto ? 'checked' : '') + '> Transcribe and grade automatically after each test</label>' +
+    '<div class="text-[11px] muted">Only the transcript text and the list of questions are sent to the grader, never the audio or the student\'s name. Whisper runs on this device and can take several minutes on an older phone. Pronunciation is always left for you to judge from the recording.</div>');
+  h += sec('Question bank', '<div class="text-xs muted">' + S.bank.friendly.length + ' friendly · ' + S.bank.p1.length + ' Part 1 · ' + Object.keys(S.bank.cards).reduce(function (n, b) { return n + S.bank.cards[b].length; }, 0) + ' Part 2 + 3 cards (bands 1 to 9)</div><button class="btn btn-acc w-full" data-act="openBank">' + ic('book', 16) + ' Open question bank, import and export</button>');
+  h += sec('Google Sheets webhook', '<div class="text-[11px] muted">Each grade gets its own webhook (set it under Edit grade). Each student becomes a tab; each saved test is one row, updated if you save it again.</div><button class="btn w-full" data-act="copyGas">' + ic('copy', 14) + ' Copy the Apps Script</button><details class="text-[11px] muted"><summary class="cursor-pointer">Setup steps</summary><ol class="list-decimal pl-5 space-y-1 pt-2"><li>Make a Google Sheet for the grade, then Extensions → Apps Script.</li><li>Paste the copied script and save.</li><li>Deploy → New deployment → Web app. Execute as: Me. Access: Anyone.</li><li>Copy the Web app URL into that grade\'s Edit grade screen.</li></ol></details><div class="text-[11px] muted">' + S.queue.length + ' result(s) waiting to send.</div>');
+  h += sec('Backup', '<label class="flex items-center gap-2 text-xs"><input type="checkbox" id="bkAudio"> Include recordings (much larger file)</label><div class="flex gap-2"><button class="btn flex-1" data-act="exportData">' + ic('download', 14) + ' Export</button><label class="btn flex-1 cursor-pointer">' + ic('upload', 14) + ' Import<input type="file" accept=".json,application/json" class="hidden" data-chg="importData"></label></div><div class="text-[11px] muted">Export includes grades, students, results and the question bank. Your AI key is left out.</div><button class="btn btn-danger w-full" data-act="resetAll">' + ic('trash', 14) + ' Erase all app data</button>');
+  return h + '<p class="text-center text-[10px] font-mono muted uppercase tracking-widest">Designed by REAPER-357</p>';
+}
+
+/* ============================== QUESTION BANK VIEW + IMPORT/EXPORT ============================== */
+var IMODE = 'merge';
+function viewBank() {
+  const tab = V.tab || 'p1', band = V.band || S.settings.lastBand || 6;
+  let h = backBtn('Settings') + '<h2 class="text-lg font-bold">Question bank</h2>';
+  h += '<div class="card p-4 space-y-3"><div class="text-xs font-semibold muted uppercase tracking-widest">Import / export</div><div class="flex flex-wrap gap-2"><button class="btn" data-act="tplDownload">' + ic('download', 14) + ' Template (.xlsx)</button><button class="btn" data-act="exportQ">' + ic('upload', 14) + ' Export bank (.xlsx)</button><label class="btn cursor-pointer">' + ic('download', 14) + ' Import file<input type="file" class="hidden" accept=".xlsx,.xls,.csv" data-chg="fileQ"></label></div>' +
+    '<div class="flex flex-wrap gap-4 text-xs"><label class="flex items-center gap-1"><input type="radio" name="imode" value="merge" data-chg="imode" ' + (IMODE === 'merge' ? 'checked' : '') + '> Merge (add new, skip duplicates)</label><label class="flex items-center gap-1"><input type="radio" name="imode" value="replace" data-chg="imode" ' + (IMODE === 'replace' ? 'checked' : '') + '> Replace what the file contains</label></div>' +
+    '<div class="flex gap-2"><input id="gsUrl" class="inp" placeholder="Google Sheet link (anyone with the link can view)"><button class="btn" data-act="importGs">Import</button></div>' +
+    '<div class="text-[11px] muted">Use the template: tabs <b>Part1</b> (Type, Question) and <b>Part2-3</b> (Band, Topic, 4 prompts, 6 Part 3 questions). To share a bank, export it and upload the .xlsx to Google Sheets (File → Import). If the link import is blocked by your browser, use File → Download → .xlsx in Google Sheets and import that file.</div><button class="btn btn-danger" data-act="resetBank">' + ic('reset', 14) + ' Reset to built-in questions</button></div>';
+  h += '<div class="flex gap-2"><button class="chip ' + (tab === 'p1' ? 'on' : '') + '" style="font-size:12px;padding:.35rem .9rem" data-act="bankTab" data-v="p1">Part 1</button><button class="chip ' + (tab === 'cards' ? 'on' : '') + '" style="font-size:12px;padding:.35rem .9rem" data-act="bankTab" data-v="cards">Bands 1 to 9 (Part 2 + 3)</button></div>';
+  if (tab === 'p1') {
+    [['friendly', 'Friendly start questions'], ['p1', 'Part 1 questions']].forEach(function (g) {
+      const k = g[0], list = S.bank[k], open = !!V['o_' + k];
+      h += '<div class="card p-3 space-y-2"><div class="flex items-center justify-between"><button class="text-sm font-semibold text-left" data-act="bankOpen" data-k="' + k + '">' + g[1] + ' <span class="chip">' + list.length + '</span></button><button class="btn" data-act="bankOpen" data-k="' + k + '" aria-label="Toggle list">' + (open ? 'Hide' : 'Show') + '</button></div>';
+      h += '<textarea id="qAdd_' + k + '" class="inp" rows="2" placeholder="Add questions (one per line, paste as many as you like)"></textarea><button class="btn btn-acc w-full" data-act="qAdd" data-k="' + k + '">' + ic('plus', 14) + ' Add</button>';
+      if (open) h += '<div class="space-y-1">' + list.map(function (q, i) { return '<div class="flex items-start justify-between gap-2 py-2 border-b bb"><div class="text-xs min-w-0">' + esc(q) + '</div><div class="flex gap-1 flex-none"><button class="btn" style="padding:.3rem .5rem" data-act="qEdit" data-k="' + k + '" data-i="' + i + '" aria-label="Edit">' + ic('edit', 13) + '</button><button class="btn btn-danger" style="padding:.3rem .5rem" data-act="qDel" data-k="' + k + '" data-i="' + i + '" aria-label="Delete">' + ic('trash', 13) + '</button></div></div>'; }).join('') + '</div>';
+      h += '</div>';
+    });
+  } else {
+    h += '<div class="flex flex-wrap gap-2 items-center"><span class="text-xs muted">Band</span>';
+    for (let b = 1; b <= 9; b++) h += '<button class="chip ' + (band === b ? 'on' : '') + '" style="font-size:12px;padding:.3rem .7rem" data-act="bankBand" data-v="' + b + '">' + b + ' · ' + (S.bank.cards[b] || []).length + '</button>';
+    h += '</div><button class="btn btn-acc w-full" data-act="cardEdit" data-b="' + band + '" data-i="-1">' + ic('plus', 14) + ' Add a band ' + band + ' card</button>';
+    (S.bank.cards[band] || []).forEach(function (c, i) {
+      h += '<div class="card p-3 space-y-1"><div class="flex items-start justify-between gap-2"><div class="min-w-0"><div class="text-sm font-semibold">' + esc(c.t) + '</div><div class="text-[11px] muted">' + c.b.length + ' prompts · ' + c.f.length + ' Part 3 questions</div></div><div class="flex gap-1 flex-none"><button class="btn" style="padding:.3rem .5rem" data-act="cardEdit" data-b="' + band + '" data-i="' + i + '" aria-label="Edit">' + ic('edit', 13) + '</button><button class="btn btn-danger" style="padding:.3rem .5rem" data-act="cardDel" data-b="' + band + '" data-i="' + i + '" aria-label="Delete">' + ic('trash', 13) + '</button></div></div><details class="text-[11px] muted"><summary class="cursor-pointer">Show prompts and questions</summary><ul class="list-disc pl-5 pt-1">' + c.b.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul><ul class="list-disc pl-5 pt-1">' + c.f.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></details></div>';
+    });
+  }
+  return h;
+}
+function cardSheet(b, i) {
+  const c = i >= 0 ? S.bank.cards[b][i] : { t: '', b: [], f: [] };
+  sheet(sheetHead((i >= 0 ? 'Edit' : 'Add') + ' band ' + b + ' card') +
+    '<div class="space-y-1"><label class="text-xs font-semibold muted">Cue card topic</label><input id="cTopic" class="inp" placeholder="Describe a …" value="' + esc(c.t) + '"></div>' +
+    '<div class="space-y-1"><label class="text-xs font-semibold muted">Areas to cover (one per line)</label><textarea id="cPrompts" class="inp" rows="4">' + esc(c.b.join('\n')) + '</textarea></div>' +
+    '<div class="space-y-1"><label class="text-xs font-semibold muted">Part 3 questions (one per line)</label><textarea id="cQs" class="inp" rows="6">' + esc(c.f.join('\n')) + '</textarea></div>' +
+    '<button class="btn btn-acc btn-lg w-full" data-act="cardSave" data-b="' + b + '" data-i="' + i + '">' + ic('check', 18) + ' Save</button>');
+}
+function lines(v) { return String(v || '').split(/\r?\n/).map(function (x) { return x.trim(); }).filter(Boolean); }
+function parseWb(wb) {
+  const out = { friendly: [], p1: [], cards: {} };
+  wb.SheetNames.forEach(function (name) {
+    if (/read\s*me|how/i.test(name)) return;
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1, defval: '' }); if (!rows.length) return;
+    const head = String(rows[0][0] || '').toLowerCase();
+    const isCards = /band/.test(head) || /part\s*2|card/i.test(name), isP1 = /^type|^question/.test(head) || /part\s*1/i.test(name);
+    if (isCards) {
+      rows.forEach(function (r) {
+        const b = parseInt(r[0], 10); if (!(b >= 1 && b <= 9)) return;
+        const t = String(r[1] || '').trim(); if (!t) return;
+        const bl = [2, 3, 4, 5].map(function (i) { return String(r[i] || '').trim(); }).filter(Boolean);
+        const f = [6, 7, 8, 9, 10, 11].map(function (i) { return String(r[i] || '').trim(); }).filter(Boolean);
+        if (!f.length) return; (out.cards[b] = out.cards[b] || []).push(C(t, bl, f));
+      });
+    } else if (isP1) {
+      rows.forEach(function (r) {
+        let type = '', q = '';
+        if (String(r[1] || '').trim()) { type = String(r[0] || '').trim().toLowerCase(); q = String(r[1]).trim(); } else q = String(r[0] || '').trim();
+        if (!q || /^(question|type)$/i.test(q)) return;
+        (/^(friendly|warm|start)/.test(type) ? out.friendly : out.p1).push(q);
+      });
+    }
+  });
+  return out;
+}
+function applyImport(p) {
+  let add = 0, dup = 0;
+  const addList = function (arr, list) { arr.forEach(function (q) { if (list.some(function (x) { return x.toLowerCase() === q.toLowerCase(); })) dup++; else { list.push(q); add++; } }); };
+  if (IMODE === 'replace') {
+    if (p.friendly.length) S.bank.friendly = []; if (p.p1.length) S.bank.p1 = [];
+    Object.keys(p.cards).forEach(function (b) { S.bank.cards[b] = []; });
+  }
+  addList(p.friendly, S.bank.friendly); addList(p.p1, S.bank.p1);
+  Object.keys(p.cards).forEach(function (b) {
+    const list = S.bank.cards[b];
+    p.cards[b].forEach(function (c) { if (list.some(function (x) { return x.t.toLowerCase() === c.t.toLowerCase(); })) dup++; else { list.push(c); add++; } });
+  });
+  save(); render(); toast(add ? 'Imported ' + add + ' item(s)' + (dup ? ', skipped ' + dup + ' duplicate(s)' : '') : 'Nothing new found' + (dup ? ' (' + dup + ' duplicates)' : ''));
+}
+function bankWb(withExamples) {
+  const wb = XLSX.utils.book_new();
+  const readme = [['IST Assist question template'], [''], ['Tab Part1: one question per row. Type = Friendly (asked first, to relax the student) or Part 1.'], ['Tab Part2-3: one row per cue card. Band = 1 to 9. Fill up to 4 areas to cover and up to 6 Part 3 questions.'], ['Keep the tab names Part1 and Part2-3 and the header rows. Delete the example rows, add your own, then import in the app (Merge or Replace).'], ['To use Google Sheets: upload this file (File → Import). To share it, set sharing to "Anyone with the link can view" and paste the link in the app.']];
+  const p1 = [['Type', 'Question']], cd = [['Band', 'Topic (cue card)', 'Prompt 1', 'Prompt 2', 'Prompt 3', 'Prompt 4', 'Part 3 Q1', 'Part 3 Q2', 'Part 3 Q3', 'Part 3 Q4', 'Part 3 Q5', 'Part 3 Q6']];
+  if (withExamples) {
+    p1.push(['Friendly', 'How are you today?'], ['Friendly', 'Did you have breakfast this morning?'], ['Part 1', 'Do you like your school?'], ['Part 1', 'What do you do on weekends?']);
+    cd.push([6, 'Describe a book you have read and enjoyed.', 'what the book was', 'what it was about', 'when you read it', 'and explain why you enjoyed it', 'Do you think people read less these days? Why?', 'Should children be encouraged to read more?', 'How can libraries attract young readers?', '', '', '']);
+  } else {
+    S.bank.friendly.forEach(function (q) { p1.push(['Friendly', q]); }); S.bank.p1.forEach(function (q) { p1.push(['Part 1', q]); });
+    for (let b = 1; b <= 9; b++) (S.bank.cards[b] || []).forEach(function (c) { const r = [b, c.t]; for (let i = 0; i < 4; i++) r.push(c.b[i] || ''); for (let j = 0; j < 6; j++) r.push(c.f[j] || ''); cd.push(r); });
+  }
+  const w1 = XLSX.utils.aoa_to_sheet(readme), w2 = XLSX.utils.aoa_to_sheet(p1), w3 = XLSX.utils.aoa_to_sheet(cd);
+  w1['!cols'] = [{ wch: 110 }]; w2['!cols'] = [{ wch: 12 }, { wch: 90 }]; w3['!cols'] = [{ wch: 6 }, { wch: 50 }, { wch: 28 }, { wch: 28 }, { wch: 28 }, { wch: 28 }, { wch: 44 }, { wch: 44 }, { wch: 44 }, { wch: 44 }, { wch: 44 }, { wch: 44 }];
+  XLSX.utils.book_append_sheet(wb, w1, 'Read me'); XLSX.utils.book_append_sheet(wb, w2, 'Part1'); XLSX.utils.book_append_sheet(wb, w3, 'Part2-3');
+  return wb;
+}
 
 /* ============================== ACTIONS ============================== */
-function download(name, text, type) {
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([text], { type: type || 'text/plain' })); a.download = name;
-  document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+function wipeStudentTests(sid) {
+  S.tests.filter(function (t) { return t.studentId === sid; }).forEach(function (t) { audioDel(t.id).catch(function () {}); });
+  S.tests = S.tests.filter(function (t) { return t.studentId !== sid; });
 }
-function csvCell(v) { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
-
+const curTest = function () { return S.tests.find(function (x) { return x.id === V.testId; }); };
 const ACT = {
-  roleExaminer: function () { askPin(function () { hideLanding(); if (T && T.sv) { T.sv = false; renderTest(); } }, 'Examiner PIN'); },
-  roleStudent: function () { if (T) { T.sv = true; hideLanding(); renderTest(); } else showLanding(true); },
-  landBack: function () { showLanding(); },
-  lockApp: function () { closeSheet(); showLanding(); },
-  svOn: function () { T.sv = true; renderTest(); },
-  svOff: function () { askPin(function () { T.sv = false; renderTest(); }, 'Examiner PIN'); },
-  pinOk: function () {
-    const i = $('#pinInp'); if (!i) return;
-    if (hashPin(i.value.trim()) === S.settings.pin) { closePin(); const f = PINCB; PINCB = null; if (f) f(); }
-    else { $('#pinErr').textContent = 'Wrong PIN'; i.value = ''; i.focus(); }
-  },
-  pinCancel: function () { PINCB = null; closePin(); },
-  setPin: function () {
-    const v = ($('#pinNew').value || '').trim();
-    if (!/^\d{4,8}$/.test(v)) { toast('PIN must be 4-8 digits'); return; }
-    S.settings.pin = hashPin(v); save(); showSettings(); toast('PIN saved');
-  },
-  pinCreate: function (d) {
-    const a = ($('#pinA').value || '').trim(), b = ($('#pinB').value || '').trim(), err = $('#pinErr');
-    if (!/^\d{4,8}$/.test(a)) { err.textContent = 'PIN must be 4-8 digits'; return; }
-    if (a !== b) { err.textContent = 'The two PINs do not match'; return; }
-    if (!$('#pinSaved').checked) { err.textContent = 'Tick the box once you have written down the recovery code'; return; }
-    S.settings.pin = hashPin(a); S.settings.rec = hashPin(normRec(d.rec)); save();
-    closePin(); toast('PIN saved');
-    const f = PINCB; PINCB = null; if (f) f();
-  },
-  pinForgot: function () {
-    $('#pinBox').innerHTML = '<div class="card w-full max-w-xs p-5 space-y-3 text-center"><div class="font-bold">Reset PIN</div><div class="text-[11px] muted">Enter your recovery code and choose a new PIN.</div><input id="rcIn" autocomplete="off" class="inp text-center font-mono" placeholder="RECOVERY CODE"><input id="pinA" type="password" inputmode="numeric" autocomplete="off" maxlength="8" class="inp text-center" placeholder="New PIN (4-8 digits)"><input id="pinB" type="password" inputmode="numeric" autocomplete="off" maxlength="8" class="inp text-center" placeholder="Repeat PIN"><div id="pinErr" class="text-xs" style="color:#f87171;min-height:1rem"></div><div class="flex gap-2"><button class="btn flex-1" data-act="pinCancel">Cancel</button><button class="btn btn-acc flex-1" data-act="pinReset">Reset</button></div></div>';
-  },
-  pinReset: function () {
-    const err = $('#pinErr'), a = ($('#pinA').value || '').trim(), b = ($('#pinB').value || '').trim();
-    if (!S.settings.rec) { err.textContent = 'No recovery code was saved on this device'; return; }
-    if (hashPin(normRec($('#rcIn').value)) !== S.settings.rec) { err.textContent = 'Recovery code is not correct'; return; }
-    if (!/^\d{4,8}$/.test(a)) { err.textContent = 'PIN must be 4-8 digits'; return; }
-    if (a !== b) { err.textContent = 'The two PINs do not match'; return; }
-    S.settings.pin = hashPin(a); save(); closePin(); toast('PIN reset');
-    const f = PINCB; PINCB = null; if (f) f();
-  },
-  newRec: function () {
-    const rec = genRec(); S.settings.rec = hashPin(normRec(rec)); save(); showSettings();
-    const el = $('#pinBox');
-    el.innerHTML = '<div class="card w-full max-w-xs p-5 space-y-3 text-center"><div class="font-bold">Your new recovery code</div><div class="font-mono text-xl font-bold accent-text" style="letter-spacing:.15em">' + rec + '</div><div class="text-[11px] muted">Write it down now. It will not be shown again, and any older code no longer works.</div><button class="btn btn-acc w-full" data-act="pinCancel">I have written it down</button></div>';
-    el.classList.remove('hidden');
-  },
-  tab: function (d) { S.ui.tab = d.v; save(); render(); },
-  toggleClass: function (d) { S.ui.open[d.id] = !S.ui.open[d.id]; save(); render(); },
+  back: function () { try { history.back(); } catch (e) {} },
+  settings: function () { go('settings'); },
+  closeSheet: function () { closeSheet(); },
   newClass: function () { classModal(); },
   editClass: function (d) { classModal(d.id); },
+  openClass: function (d) { go('class', { classId: d.id }); },
   saveClass: function (d) {
-    const name = $('#cmName').value.trim(); if (!name) { toast('Enter a class name'); return; }
-    const names = parseNames($('#cmNames').value);
-    let c = d.id && S.classes.find(function (x) { return x.id === d.id; });
-    if (!c) { c = { id: uid(), name: name, students: [] }; S.classes.push(c); S.ui.open[c.id] = true; }
+    const name = $('#cmName').value.trim(); if (!name) { toast('Enter a grade name'); return; }
+    const names = parseNames($('#cmNames').value), hook = $('#cmHook').value.trim();
+    let c = d.id && S.classes.find(function (x) { return x.id === d.id; }), isNew = false;
+    if (!c) { c = { id: uid(), name: name, students: [], webhook: hook }; isNew = true; }
+    const keep = {}; names.forEach(function (n) { keep[n.toLowerCase()] = 1; });
+    const gone = c.students.filter(function (s) { return !keep[s.name.toLowerCase()]; });
+    const nTests = gone.reduce(function (n, s) { return n + S.tests.filter(function (t) { return t.studentId === s.id; }).length; }, 0);
+    if (nTests && !confirm('Removing ' + gone.length + ' student(s) will also delete their ' + nTests + ' test result(s). Continue?')) return;
+    gone.forEach(function (s) { wipeStudentTests(s.id); });
     const old = {}; c.students.forEach(function (s) { old[s.name.toLowerCase()] = s; });
-    c.name = name; c.students = names.map(function (n) { return old[n.toLowerCase()] || { id: uid(), name: n }; });
-    save(); closeSheet(); render(); toast(c.students.length + ' students saved');
+    c.name = name; c.webhook = hook; c.students = names.map(function (n) { return old[n.toLowerCase()] || { id: uid(), name: n }; });
+    S.tests.forEach(function (t) { if (t.classId === c.id) t.className = name; });
+    if (isNew) S.classes.push(c);
+    save(); closeSheet(); if (isNew) go('class', { classId: c.id }); else render();
+    toast(c.students.length + ' students saved');
   },
   delClass: function (d) {
-    if (!confirm('Delete this class and ALL its test results?')) return;
-    S.classes = S.classes.filter(function (c) { return c.id !== d.id; });
-    S.rounds = S.rounds.filter(function (r) { return r.classId !== d.id; });
-    S.results = S.results.filter(function (r) { return r.classId !== d.id; });
-    save(); render();
-  },
-  newRound: function (d) { roundModal(d.id); },
-  saveRound: function (d) {
-    const label = $('#rmLabel').value.trim() || 'Test', band = +$('#rmBand').value, month = $('#rmMonth').value || monthKey();
-    const r = { id: uid(), classId: d.id, label: label, band: band, month: month, created: Date.now() };
-    S.rounds.push(r); S.ui.round[d.id] = r.id; S.settings.lastBand = band; save(); closeSheet(); render();
-  },
-  start: function (d) { startTest(d.sid, d.cid, d.rid); },
-  resToggle: function (d) { S.ui.ropen[d.id] = !S.ui.ropen[d.id]; save(); render(); },
-  delRes: function (d) { if (!confirm('Delete this result?')) return; S.results = S.results.filter(function (r) { return r.id !== d.id; }); save(); render(); },
-  csv: function (d) {
-    const c = S.classes.find(function (x) { return x.id === d.id; }); if (!c) return;
-    const rows = [['Student', 'Test', 'Month', 'Date', 'Target Band', 'Fluency', 'Lexical', 'Grammar', 'Pronunciation', 'Band', 'Percent', 'Notes']];
-    roundsOf(c.id).forEach(function (r) { c.students.forEach(function (s) { const x = resFor(s.id, r.id); if (x) rows.push([s.name, r.label, r.month, x.date, r.band, x.scores.fc, x.scores.lr, x.scores.gra, x.scores.pr, x.band, x.pct, x.notes]); }); });
-    download('IST-' + c.name.replace(/\W+/g, '_') + '-' + today() + '.csv', rows.map(function (r) { return r.map(csvCell).join(','); }).join('\n'), 'text/csv');
+    if (!confirm('Delete this grade, all its students and ALL their test results and recordings?')) return;
+    const c = S.classes.find(function (x) { return x.id === d.id; });
+    if (c) c.students.forEach(function (s) { wipeStudentTests(s.id); });
+    S.classes = S.classes.filter(function (x) { return x.id !== d.id; });
+    save(); closeSheet(); V = { name: 'home' }; try { history.pushState({ v: V }, ''); } catch (e) {} render();
   },
   syncClass: function (d) {
-    if (!S.settings.webhook) { toast('Add your webhook URL in Settings first'); return; }
-    const ids = S.results.filter(function (r) { return r.classId === d.id; }).map(function (r) { return r.id; });
+    const c = S.classes.find(function (x) { return x.id === d.id; });
+    if (!c || !c.webhook) { toast('Save a webhook URL for this grade first'); return; }
+    const ids = S.tests.filter(function (t) { return t.classId === d.id; }).map(function (t) { return t.id; });
     queueIds(ids); toast('Sending ' + ids.length + ' result(s)…');
   },
-  syncAll: function () {
-    if (!S.settings.webhook) { toast('Paste your webhook URL first'); return; }
-    queueIds(S.results.map(function (r) { return r.id; })); toast('Sending ' + S.results.length + ' result(s)…');
+  openStudent: function (d) { go('student', { classId: V.classId, studentId: d.sid }); },
+  renameStudent: function (d) {
+    const c = S.classes.find(function (x) { return x.id === V.classId; }), s = c && c.students.find(function (x) { return x.id === d.sid; }); if (!s) return;
+    const n = prompt('Student name', s.name); if (!n || !n.trim()) return;
+    s.name = n.trim(); S.tests.forEach(function (t) { if (t.studentId === s.id) { t.studentName = s.name; t.saved = false; } }); save(); render();
   },
-  settings: function () { showSettings(); },
-  closeSheet: function () { closeSheet(); },
-  theme: function (d) { setAppTheme(d.v); showSettings(); },
-  accent: function (d) { setAccentColor(d.v); showSettings(); },
-  mode: function (d) { S.settings.mode = d.v; save(); showSettings(); },
-  testSound: function () { ensureAC(); beep(); },
-  copyGas: function () {
-    const done = function () { toast('Script copied'); };
-    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(GAS).then(done, function () { fallbackCopy(); });
-    else fallbackCopy();
-    function fallbackCopy() { const t = document.createElement('textarea'); t.value = GAS; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); done(); } catch (e) { toast('Copy failed'); } t.remove(); }
+  delStudent: function (d) {
+    const c = S.classes.find(function (x) { return x.id === V.classId; }), s = c && c.students.find(function (x) { return x.id === d.sid; }); if (!s) return;
+    const n = S.tests.filter(function (t) { return t.studentId === s.id; }).length;
+    if (!confirm('Delete ' + s.name + (n ? ' and their ' + n + ' test result(s) and recordings' : '') + '?')) return;
+    wipeStudentTests(s.id); c.students = c.students.filter(function (x) { return x.id !== s.id; }); save(); render();
   },
-  exportData: function () { download('ist-assist-backup-' + today() + '.json', JSON.stringify(S), 'application/json'); },
-  resetAll: function () { if (!confirm('Erase ALL classes, results and custom questions on this device?')) return; if (!confirm('Really erase everything? This cannot be undone.')) return; localStorage.removeItem(LS); location.reload(); },
-  bank: function () { showBank(); },
-  bankKind: function (d) { B.kind = d.v; showBank(); },
-  bankBand: function (d) { B.band = +d.v; showBank(); },
-  bankAdd: function () {
-    if (B.kind === 'cards') {
-      const t = $('#bkTopic').value.trim(), b = $('#bkBul').value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean), f = $('#bkFol').value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
-      if (!t || !b.length || !f.length) { toast('Add a topic, prompts and follow-up questions'); return; }
-      (S.custom.cards[B.band] = S.custom.cards[B.band] || []).push(C(t, b, f));
-    } else {
-      const lines = $('#bkText').value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
-      if (!lines.length) { toast('Nothing to add'); return; }
-      if (B.kind === 'p1') { S.custom.p1[B.band] = (S.custom.p1[B.band] || []).concat(lines); }
-      else S.custom[B.kind] = S.custom[B.kind].concat(lines);
-    }
-    save(); showBank(); toast('Added');
+  testStart: function (d) { bandSheet(d.sid); },
+  pickBand: function (d) { beginSetup(d.sid, +d.b); },
+  openTest: function (d) { go('result', { testId: d.id, classId: V.classId, studentId: V.studentId }); },
+  delTest: function (d) {
+    const t = S.tests.find(function (x) { return x.id === d.id; }); if (!t) return;
+    if (!confirm('Delete this test result and its recording?')) return;
+    audioDel(t.id).catch(function () {}); S.tests = S.tests.filter(function (x) { return x.id !== t.id; }); save();
+    if (V.name === 'result') { try { history.back(); } catch (e) { render(); } } else render();
   },
-  bankDel: function (d) {
-    const o = items(B.kind, B.band)[+d.n]; if (!o || o.builtin) return;
-    if (B.kind === 'cards') S.custom.cards[B.band].splice(o.i, 1);
-    else if (B.kind === 'p1') S.custom.p1[B.band].splice(o.i, 1);
-    else S.custom[B.kind].splice(o.i, 1);
-    save(); showBank();
-  },
-  bankHide: function (d) { const o = items(B.kind, B.band)[+d.n]; if (!o) return; if (S.hidden[o.id]) delete S.hidden[o.id]; else S.hidden[o.id] = true; save(); showBank(); },
-
-  /* test */
-  tNext: function () { tNext(); },
-  tBack: function () { tBack(); },
-  tExit: function () { if (confirm('Leave this test? Progress will be lost.')) closeTest(); },
-  tSwap: function () {
-    const st = T.steps[T.si], list = T.picks[st];
-    const kind = st === 'warm' ? 'warm' : 'p1';
-    const pool = active(kind, T.band).filter(function (q) { return list.indexOf(q) < 0; });
+  /* live test */
+  tBegin: function () { tBeginAsync(); },
+  tCancel: function () { if (confirm('Cancel this test? The recording and progress will be discarded.')) closeTest(); },
+  tProceed: function () { tmStop(); if (T.step === 'p1') { T.step = 'p2'; T.p2 = 0; } else if (T.step === 'p2') { if (T.p2 === 1 || T.p2 === 3) T.p2 = 4; T.step = 'p3'; } renderTest(); const sc = $('#testView [data-scroll]'); if (sc) sc.scrollTop = 0; },
+  tBack: function () { tmStop(); if (T.step === 'p3') { T.step = 'p2'; } else if (T.step === 'p2') { T.step = 'p1'; } if (T.p2 === 1 || T.p2 === 3) T.p2 = 0; renderTest(); },
+  chk: function (d, el) { const key = d.k + d.i; T.checks[key] = !T.checks[key]; el.classList.toggle('done', !!T.checks[key]); },
+  qswap: function (d) {
+    const k = d.k, i = +d.i, pool = S.bank[k].filter(function (q) { return T.q[k].indexOf(q) < 0; });
     if (!pool.length) { toast('No other questions available'); return; }
-    list[T.qi] = pool[Math.floor(Math.random() * pool.length)]; renderTest();
+    T.q[k][i] = pool[Math.floor(Math.random() * pool.length)]; T.checks[k + i] = false; renderTest();
   },
   tSwapCard: function () {
-    const pool = active('cards', T.band).filter(function (c) { return c.t !== T.card.t; });
-    if (!pool.length) { toast('No other cards available'); return; }
-    T.card = pool[Math.floor(Math.random() * pool.length)]; T.picks.p3 = T.card.f.slice(0, S.settings.nP3); renderTest();
+    const pool = (S.bank.cards[T.band] || []).filter(function (c) { return c.t !== T.card.t; });
+    if (!pool.length) { toast('No other cards for this band'); return; }
+    T.card = pool[Math.floor(Math.random() * pool.length)]; T.q.p3 = T.card.f.slice(0, S.settings.nP3); T.checks = Object.assign({}, T.checks); renderTest();
   },
   p2Prep: function () { T.p2 = 1; tmStart(60, function () { T.p2 = 2; renderTest(); }); renderTest(); },
   p2Skip: function () { tmStop(); T.p2 = 2; renderTest(); },
@@ -802,32 +1107,131 @@ const ACT = {
     else if (TM.left > 0) { TM.running = true; TM.end = Date.now() + TM.left * 1000; TM.iv = setInterval(tmTick, 200); }
     renderTest();
   },
-  sc: function (d) { T.scores[d.k] = Math.max(0, Math.min(9, T.scores[d.k] + parseFloat(d.d))); renderTest(); },
-  saveRes: function () {
-    const band = calcBand(T.scores);
-    const old = resFor(T.sid, T.rid);
-    const rec = { id: old ? old.id : uid(), studentId: T.sid, classId: T.cid, roundId: T.rid, studentName: T.name, scores: { fc: T.scores.fc, lr: T.scores.lr, gra: T.scores.gra, pr: T.scores.pr }, band: band, pct: pct(band), notes: T.notes.trim(), date: today(), q: { warm: T.picks.warm || null, intro: T.picks.intro || null, p1: T.picks.p1 || [], card: T.card ? T.card.t : '', p3: T.picks.p3 || [] } };
-    S.results = S.results.filter(function (r) { return !(r.studentId === T.sid && r.roundId === T.rid); });
-    S.results.push(rec); save(); queueIds([rec.id]);
-    const nm = T.name; closeTest(); toast(nm + ': Band ' + band.toFixed(1) + ' (' + rec.pct + '%) saved');
+  tFinish: function () { finishTest(); },
+  /* results */
+  sc: function (d) { const t = curTest(); if (!t) return; t.scores[d.k] = Math.max(0, Math.min(9, t.scores[d.k] + parseFloat(d.d))); t.edited = true; recalcT(t); patchScores(t); markDirty(t); },
+  saveRes: function (d) {
+    const t = S.tests.find(function (x) { return x.id === d.id; }); if (!t) return;
+    recalcT(t); t.saved = true; save(); setBadge(t); queueIds([t.id]);
+    const c = S.classes.find(function (x) { return x.id === t.classId; });
+    toast('Saved' + (c && c.webhook ? ' and sent to Google Sheets' : ' in the app (add a webhook under Edit grade to send to Sheets)'));
+  },
+  share: function (d) { const t = S.tests.find(function (x) { return x.id === d.id; }); if (t) shareResult(t); },
+  saveAudio: async function (d) {
+    const t = S.tests.find(function (x) { return x.id === d.id; }); if (!t) return;
+    const b = await audioGet(t.id); if (!b) { toast('Recording not found'); return; }
+    const p = await exportAudio(t, b, true); t.audioFile = p; save(); patchResult(t.id); toast('Audio: ' + p);
+  },
+  aiStt: function (d) { doStt(d.id); },
+  aiGrade: function (d) {
+    const t = S.tests.find(function (x) { return x.id === d.id; }); if (!t) return;
+    let ow = true; if (t.ai || t.edited || t.fbEdited) { if (!confirm('Replace your current scores and feedback with a new AI draft?')) return; }
+    doGrade(d.id, ow);
+  },
+  /* settings */
+  theme: function (d) { setAppTheme(d.v); render(); },
+  accent: function (d) { setAccentColor(d.v); render(); },
+  testSound: function () { ensureAC(); beep(); },
+  pickDir: async function () {
+    if (!window.showDirectoryPicker) { toast('Folder choosing is not supported in this browser. Use Download, or the Android app.'); return; }
+    try { const h = await window.showDirectoryPicker({ mode: 'readwrite' }); await kvPut('dir', h); S.settings.audio.mode = 'folder'; save(); render(); toast('Folder set: ' + h.name); } catch (e) {}
+  },
+  copyGas: function () { copyText(GAS); },
+  exportData: async function () {
+    const o = { app: 'ist-assist', v: 2, data: JSON.parse(JSON.stringify(S)) }; o.data.settings.ai.key = '';
+    const inc = $('#bkAudio') && $('#bkAudio').checked;
+    if (inc) { o.audio = {}; for (let i = 0; i < S.tests.length; i++) { const t = S.tests[i]; if (!t.audio) continue; try { const b = await audioGet(t.id); if (b) o.audio[t.id] = { mime: b.type, data: await blobToB64(b) }; } catch (e) {} } }
+    download('ist-assist-backup-' + today() + '.json', new Blob([JSON.stringify(o)], { type: 'application/json' })); toast('Backup exported');
+  },
+  resetAll: function () {
+    if (!confirm('Erase ALL grades, results, recordings and settings on this device?')) return;
+    if (!confirm('Really erase everything? This cannot be undone.')) return;
+    localStorage.removeItem(LS); try { indexedDB.deleteDatabase('ist_assist'); } catch (e) {} setTimeout(function () { location.reload(); }, 300);
+  },
+  /* bank */
+  openBank: function () { go('bank', { tab: 'p1', band: S.settings.lastBand }); },
+  bankTab: function (d) { V.tab = d.v; render(); },
+  bankBand: function (d) { V.band = +d.v; render(); },
+  bankOpen: function (d, el, ev) { if (ev) ev.preventDefault(); V['o_' + d.k] = !V['o_' + d.k]; render(); },
+  qAdd: function (d) {
+    const ta = $('#qAdd_' + d.k), arr = lines(ta.value); if (!arr.length) { toast('Type or paste some questions first'); return; }
+    let add = 0; arr.forEach(function (q) { if (!S.bank[d.k].some(function (x) { return x.toLowerCase() === q.toLowerCase(); })) { S.bank[d.k].push(q); add++; } });
+    save(); render(); toast(add + ' added');
+  },
+  qEdit: function (d) { sheet(sheetHead('Edit question') + '<textarea id="qTxt" class="inp" rows="3">' + esc(S.bank[d.k][+d.i]) + '</textarea><button class="btn btn-acc btn-lg w-full" data-act="qSave" data-k="' + d.k + '" data-i="' + d.i + '">Save</button>'); },
+  qSave: function (d) { const v = $('#qTxt').value.trim(); if (!v) { toast('Question is empty'); return; } S.bank[d.k][+d.i] = v; save(); closeSheet(); render(); },
+  qDel: function (d) { if (!confirm('Delete this question?')) return; S.bank[d.k].splice(+d.i, 1); save(); render(); },
+  cardEdit: function (d) { cardSheet(+d.b, +d.i); },
+  cardSave: function (d) {
+    const t = $('#cTopic').value.trim(), b = lines($('#cPrompts').value), f = lines($('#cQs').value);
+    if (!t || !f.length) { toast('Add a topic and at least one Part 3 question'); return; }
+    const band = +d.b, i = +d.i, card = C(t, b, f);
+    if (i >= 0) S.bank.cards[band][i] = card; else S.bank.cards[band].push(card);
+    save(); closeSheet(); render();
+  },
+  cardDel: function (d) { if (!confirm('Delete this card?')) return; S.bank.cards[+d.b].splice(+d.i, 1); save(); render(); },
+  resetBank: function () { if (!confirm('Replace the whole question bank with the built-in questions? Your own questions will be lost.')) return; S.bank = JSON.parse(JSON.stringify({ friendly: BK.friendly, p1: BK.p1, cards: BK.cards })); save(); render(); toast('Question bank reset'); },
+  tplDownload: async function () { try { await needXlsx(); XLSX.writeFile(bankWb(true), 'IST-Assist-Question-Template.xlsx'); } catch (e) { toast(e.message); } },
+  exportQ: async function () { try { await needXlsx(); XLSX.writeFile(bankWb(false), 'IST-Assist-Question-Bank-' + today() + '.xlsx'); } catch (e) { toast(e.message); } },
+  importGs: async function () {
+    const url = ($('#gsUrl').value || '').trim(), m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (!m) { toast('Paste the Google Sheet link first'); return; }
+    try {
+      await needXlsx();
+      const get = async function (tab) { const r = await fetch('https://docs.google.com/spreadsheets/d/' + m[1] + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(tab)); if (!r.ok) throw new Error('blocked'); return XLSX.read(await r.text(), { type: 'string' }); };
+      const out = { friendly: [], p1: [], cards: {} };
+      let got = 0;
+      try { const p = parseWb(await get('Part1')); out.friendly = p.friendly; out.p1 = p.p1; got++; } catch (e) {}
+      try { const c = parseWb(await get('Part2-3')); out.cards = c.cards; got++; } catch (e) {}
+      if (!got) throw new Error('blocked');
+      applyImport(out);
+    } catch (e) { toast('Could not read that sheet. Make sure it is shared with "Anyone with the link", or download it as .xlsx and use Import file.'); }
   }
 };
-
 const CHG = {
-  round: function (t) { S.ui.round[t.dataset.id] = t.value; save(); render(); },
-  rclass: function (t) { S.ui.rclass = t.value; save(); render(); },
-  cfgnum: function (t) { let v = parseFloat(t.value); if (isNaN(v)) return; const mn = +t.min, mx = +t.max; v = Math.max(mn, Math.min(mx, v)); S.settings[t.dataset.k] = v; save(); },
-  sound: function (t) { S.settings.sound = t.checked; save(); },
-  webhook: function (t) { S.settings.webhook = t.value.trim(); save(); flush(); },
-  importData: function (t) {
-    const f = t.files && t.files[0]; if (!f) return;
+  set: function (el) {
+    const p = el.dataset.p.split('.'); let o = S.settings;
+    for (let i = 0; i < p.length - 1; i++) o = o[p[i]];
+    const k = p[p.length - 1]; let v;
+    if (el.type === 'checkbox') v = el.checked;
+    else if (el.type === 'number') { v = parseFloat(el.value); if (isNaN(v)) return; if (el.min !== '') v = Math.max(+el.min, v); if (el.max !== '') v = Math.min(+el.max, v); }
+    else v = el.value.trim();
+    if (k === 'kbps') v = +v;
+    o[k] = v; save();
+    if (el.tagName === 'SELECT' || el.type === 'checkbox') render();
+  },
+  imode: function (el) { IMODE = el.value; },
+  fileQ: async function (el) {
+    const f = el.files && el.files[0]; if (!f) return;
+    try {
+      await needXlsx();
+      const wb = /\.csv$/i.test(f.name) ? XLSX.read(await f.text(), { type: 'string' }) : XLSX.read(await f.arrayBuffer(), { type: 'array' });
+      applyImport(parseWb(wb));
+    } catch (e) { toast((e && e.message) || 'Could not read that file'); }
+    el.value = '';
+  },
+  importData: function (el) {
+    const f = el.files && el.files[0]; if (!f) return;
     const r = new FileReader();
-    r.onload = function () {
-      try { const j = JSON.parse(r.result); if (!j.classes || !j.settings) throw 0; if (!confirm('Replace current data with this backup?')) return; localStorage.setItem(LS, JSON.stringify(j)); location.reload(); }
-      catch (e) { toast('Not a valid IST Assist backup'); }
+    r.onload = async function () {
+      try {
+        const j = JSON.parse(r.result); if (!j.data || !j.data.classes) throw 0;
+        if (!confirm('Replace everything on this device with this backup?')) return;
+        const keepKey = S.settings.ai.key; j.data.settings = j.data.settings || {}; j.data.settings.ai = Object.assign({}, j.data.settings.ai, { key: keepKey });
+        localStorage.setItem(LS, JSON.stringify(j.data));
+        if (j.audio) for (const id in j.audio) { try { const bin = atob(j.audio[id].data), arr = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i); await audioPut(id, new Blob([arr], { type: j.audio[id].mime })); } catch (e) {} }
+        location.reload();
+      } catch (e) { toast('Not a valid IST Assist backup'); }
     };
     r.readAsText(f);
   }
+};
+const INP = {
+  transcript: function (el) { const t = curTest(); if (t) { t.transcript = el.value; markDirty(t); } },
+  feedback: function (el) { const t = curTest(); if (t) { t.feedback = el.value; t.fbEdited = true; markDirty(t); } },
+  followup: function (el) { const t = curTest(); if (t) { t.followup = el.value; t.fbEdited = true; markDirty(t); } },
+  notes: function (el) { const t = curTest(); if (t) { t.notes = el.value; markDirty(t); } },
+  tnotes: function (el) { if (T) T.notes = el.value; }
 };
 
 document.addEventListener('click', function (e) {
@@ -835,53 +1239,20 @@ document.addEventListener('click', function (e) {
   const b = e.target.closest('[data-act]');
   if (b && ACT[b.dataset.act]) ACT[b.dataset.act](b.dataset, b, e);
 });
-document.addEventListener('change', function (e) { const t = e.target.closest('[data-chg]'); if (t && CHG[t.dataset.chg]) CHG[t.dataset.chg](t); });
-document.addEventListener('input', function (e) { if (e.target.id === 'tNotes' && T) T.notes = e.target.value; });
+document.addEventListener('change', function (e) { const t = e.target.closest('[data-chg]'); if (t && CHG[t.dataset.chg]) CHG[t.dataset.chg](t, e); });
+document.addEventListener('input', function (e) { const t = e.target.closest('[data-inp]'); if (t && INP[t.dataset.inp]) INP[t.dataset.inp](t); });
 window.addEventListener('online', flush);
-document.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target && e.target.id === 'pinInp') ACT.pinOk(); });
+window.addEventListener('popstate', function (e) {
+  if (T) { try { history.pushState({ v: V }, ''); } catch (x) {} if (confirm('Leave the test? The recording and progress will be discarded.')) closeTest(); return; }
+  closeSheet(); V = (e.state && e.state.v) || { name: 'home' }; render();
+});
 document.addEventListener('visibilitychange', function () { if (T && document.visibilityState === 'visible') wake(); });
-
-/* ============================== LANDING / PIN / STUDENT VIEW ============================== */
-function hashPin(p) { let h = 2166136261; const s = 'ist|' + p; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36); }
-let PINCB = null;
-function closePin() { const el = $('#pinBox'); el.classList.add('hidden'); el.innerHTML = ''; }
-function askPin(cb, title) {
-  if (!S.settings.pin) { showPinSetup(cb); return; }
-  PINCB = cb;
-  const el = $('#pinBox');
-  el.innerHTML = '<div class="card w-full max-w-xs p-5 space-y-3 text-center"><div class="accent-text flex justify-center">' + ic('lock', 30) + '</div><div class="font-bold">' + esc(title || 'Examiner PIN') + '</div><input id="pinInp" type="password" inputmode="numeric" autocomplete="off" maxlength="8" class="inp text-center text-lg" style="letter-spacing:.4em" placeholder="PIN"><div id="pinErr" class="text-xs h-4" style="color:#f87171"></div><div class="flex gap-2"><button class="btn flex-1" data-act="pinCancel">Cancel</button><button class="btn btn-acc flex-1" data-act="pinOk">Unlock</button></div><button class="text-xs muted underline" data-act="pinForgot">Forgot PIN?</button></div>';
-  el.classList.remove('hidden');
-  setTimeout(function () { const i = $('#pinInp'); if (i) i.focus(); }, 60);
-}
-function normRec(x) { return String(x || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
-function genRec() {
-  const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', b = new Uint8Array(10);
-  try { crypto.getRandomValues(b); } catch (e) { for (let i = 0; i < 10; i++) b[i] = Math.floor(Math.random() * 256); }
-  let r = ''; for (let i = 0; i < 10; i++) r += a[b[i] % a.length];
-  return r.slice(0, 5) + '-' + r.slice(5);
-}
-function showPinSetup(cb) {
-  PINCB = cb;
-  const rec = genRec(), el = $('#pinBox');
-  el.innerHTML = '<div class="card w-full max-w-xs p-5 space-y-3 text-center max-h-[92vh] overflow-y-auto"><div class="accent-text flex justify-center">' + ic('lock', 30) + '</div><div class="font-bold">Set an Examiner PIN</div><div class="text-[11px] muted">This keeps students out of your classes, scores and question bank.</div><input id="pinA" type="password" inputmode="numeric" autocomplete="off" maxlength="8" class="inp text-center" placeholder="New PIN (4-8 digits)"><input id="pinB" type="password" inputmode="numeric" autocomplete="off" maxlength="8" class="inp text-center" placeholder="Repeat PIN"><div class="card p-3 space-y-1"><div class="text-[11px] muted">Recovery code. Write it down: it is the only way to reset a forgotten PIN.</div><div class="font-mono text-lg font-bold accent-text" style="letter-spacing:.15em">' + rec + '</div></div><label class="flex items-center gap-2 text-xs text-left"><input type="checkbox" id="pinSaved"> I have written down my recovery code</label><div id="pinErr" class="text-xs" style="color:#f87171;min-height:1rem"></div><div class="flex gap-2"><button class="btn flex-1" data-act="pinCancel">Cancel</button><button class="btn btn-acc flex-1" data-act="pinCreate" data-rec="' + rec + '">Save</button></div></div>';
-  el.classList.remove('hidden');
-}
-function hideLanding() { const el = $('#landing'); el.classList.add('hidden'); el.innerHTML = ''; }
-function showLanding(student) {
-  const el = $('#landing'); el.classList.remove('hidden');
-  if (student) {
-    el.innerHTML = '<div class="w-full max-w-sm text-center space-y-5"><img src="small-icon.png" data-emb="sm" alt="" class="w-20 h-20 mx-auto rounded-full object-cover border bb" /><h2 class="text-xl font-bold">Welcome!</h2><p class="text-sm muted">Please wait. Your examiner will start your speaking test soon.</p><button class="btn" data-act="landBack">' + ic('back', 16) + ' Back</button></div>';
-  } else {
-    el.innerHTML = '<div class="w-full max-w-sm text-center space-y-6"><img src="icon.png" data-emb="lg" alt="IST Assist" class="w-44 h-44 mx-auto rounded-3xl object-cover border-2 bb shadow-lg" /><div><h1 class="text-2xl font-extrabold tracking-tight accent-text">IST ASSIST</h1><p class="text-xs muted pt-1">IELTS Speaking Test Assistant</p></div><div class="space-y-3"><button class="btn btn-acc btn-lg w-full" data-act="roleExaminer">' + ic('edit', 20) + ' I am the Examiner</button><button class="btn btn-lg w-full" data-act="roleStudent">' + ic('mic', 20) + ' I am a Student</button></div><p class="text-[10px] font-mono muted uppercase tracking-widest pt-2">Made by REAPER-357</p></div>';
-  }
-  fixImgs(el);
-}
 
 /* ============================== INIT ============================== */
 window.addEventListener('DOMContentLoaded', function () {
-  setAccentColor(S.settings.accent);
-  setAppTheme(S.settings.theme);
-  hydrate(); fixImgs(); render(); flush(); showLanding();
+  setAccentColor(S.settings.accent); setAppTheme(S.settings.theme);
+  try { history.replaceState({ v: V }, ''); } catch (e) {}
+  hydrate(); fixImgs(); render(); flush();
   if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) navigator.serviceWorker.register('sw.js').catch(function () {});
 });
 </script>
