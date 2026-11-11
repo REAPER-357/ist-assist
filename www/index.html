@@ -63,6 +63,10 @@
         .qtext { font-size: 1.5rem; line-height: 1.35; font-weight: 700; }
         @keyframes pulse2 { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
         .flash { animation: pulse2 .5s 6; }
+        .stu { display: none; }
+        #testView.sv .stu { display: inline-flex; }
+        #testView.sv .exm { display: none !important; }
+        #testView.sv .qtext { font-size: 2.1rem; }
     </style>
 </head>
 <body id="appBody" class="min-h-screen flex flex-col font-sans transition-colors duration-200 select-none pb-24">
@@ -77,6 +81,7 @@
             </div>
         </div>
         <div class="flex items-center space-x-2">
+            <button data-act="lockApp" aria-label="Lock app" class="p-2.5 rounded-xl hover:opacity-70 transition"><span data-i="lock" data-s="22"></span></button>
             <button id="openSettingsBtn" data-act="settings" aria-label="Open settings" class="p-2.5 rounded-xl hover:opacity-70 transition"><span data-i="gear" data-s="22"></span></button>
         </div>
     </header>
@@ -100,6 +105,10 @@
 
     <!-- TEST VIEW -->
     <div id="testView" class="fixed inset-0 z-[55] hidden flex flex-col" style="background:var(--page-bg)"></div>
+
+    <!-- LANDING (role select) & PIN PROMPT -->
+    <div id="landing" class="fixed inset-0 z-[70] flex items-center justify-center p-6 overflow-y-auto" style="background:var(--page-bg)"></div>
+    <div id="pinBox" class="fixed inset-0 z-[90] hidden flex items-center justify-center p-6" style="background:rgba(0,0,0,.8)"></div>
 
 <script>
 /* ============================== ICONS (inline SVG, no network) ============================== */
@@ -129,7 +138,9 @@ const P = {
   book:'<path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 21h15"/>',
   volume:'<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 010 6"/>',
   eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
-  eyeoff:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/>'
+  eyeoff:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/>',
+  lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/>',
+  screen:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>'
 };
 function ic(n, s) { s = s || 20; return '<svg class="ic" width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (P[n] || '') + '</svg>'; }
 function hydrate() { document.querySelectorAll('[data-i]').forEach(function (el) { el.innerHTML = ic(el.dataset.i, +el.dataset.s || 20); }); }
@@ -227,7 +238,7 @@ function defaults() {
     classes: [], rounds: [], results: [], queue: [], hidden: {}, used: {},
     custom: { warm: [], intro: [], p1: {}, cards: {} },
     ui: { tab: 'classes', open: {}, round: {}, rclass: '', ropen: {} },
-    settings: { theme: 'black', accent: '#10b981', mode: 'own', nWarm: 3, nP1: 4, nP3: 4, sound: true, fullBand: 9, webhook: '', lastBand: 6 }
+    settings: { theme: 'black', accent: '#10b981', mode: 'own', nWarm: 3, nP1: 4, nP3: 4, sound: true, fullBand: 9, webhook: '', lastBand: 6, pin: '' }
   };
 }
 let S = defaults();
@@ -464,7 +475,8 @@ function showSettings() {
     [['black', 'Pure Black'], ['dark', 'Dark'], ['light', 'Light']].map(function (t) { return '<button class="btn ' + (s.theme === t[0] ? 'btn-acc' : '') + '" data-act="theme" data-v="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>' +
     '<div class="flex items-center justify-around pt-1">' + acc.map(function (a) { return '<button aria-label="' + a[1] + ' accent" data-act="accent" data-v="' + a[0] + '" class="w-8 h-8 rounded-full" style="background:' + a[0] + ';outline:' + (s.accent === a[0] ? '2px solid var(--page-fg)' : 'none') + ';outline-offset:2px"></button>'; }).join('') + '</div></div>' +
 
-    '<div class="space-y-2"><span class="text-xs font-semibold muted">EXAMINER MODE</span>' +
+    '<div class="space-y-2"><span class="text-xs font-semibold muted">EXAMINER PIN</span><div class="text-[11px] muted">' + (s.pin ? 'A PIN is set.' : 'No PIN set.') + ' It is asked when entering Examiner mode and when leaving Student view. It keeps curious students out; it is not encryption.</div><div class="flex gap-2"><input id="pinNew" type="password" inputmode="numeric" maxlength="8" class="inp" placeholder="New PIN (4-8 digits)"><button class="btn btn-acc" data-act="setPin">Save</button>' + (s.pin ? '<button class="btn btn-danger" data-act="clearPin">Remove</button>' : '') + '</div></div>' +
+    '<div class="space-y-2"><span class="text-xs font-semibold muted">TEST TYPE</span>' +
     '<button class="card w-full p-3 text-left ' + (s.mode === 'own' ? 'accent-border' : '') + '" style="' + (s.mode === 'own' ? 'border-color:var(--accent-color)' : '') + '" data-act="mode" data-v="own"><div class="text-sm font-semibold">My own students</div><div class="text-[11px] muted">Friendly warm-up questions (How are you today?). No ID or name questions.</div></button>' +
     '<button class="card w-full p-3 text-left" style="' + (s.mode === 'outside' ? 'border-color:var(--accent-color)' : '') + '" data-act="mode" data-v="outside"><div class="text-sm font-semibold">Outside examiner</div><div class="text-[11px] muted">Starts with name, ID check, where you live, work or study.</div></button></div>' +
 
@@ -535,7 +547,7 @@ function startTest(sid, cid, rid) {
   $('#testView').classList.remove('hidden');
   renderTest();
 }
-function closeTest() { tmStop(); unwake(); T = null; const v = $('#testView'); v.classList.add('hidden'); v.innerHTML = ''; render(); }
+function closeTest() { tmStop(); unwake(); T = null; const v = $('#testView'); v.classList.remove('sv'); v.classList.add('hidden'); v.innerHTML = ''; render(); }
 function tNext() {
   const st = T.steps[T.si];
   if (LIST[st] && T.qi < T.picks[st].length - 1) { T.qi++; }
@@ -551,6 +563,7 @@ function tBack() {
 
 function renderTest() {
   const st = T.steps[T.si], el = $('#testView');
+  const sv = !!T.sv;
   const prog = T.steps.map(function (s, i) { return '<div class="h-1 flex-1 rounded-full" style="background:' + (i <= T.si ? 'var(--accent-color)' : 'var(--bar-border)') + '"></div>'; }).join('');
   let body = '', foot = '';
   const topic = T.card ? T.card.t.replace(/^Describe\s+/i, '') : '';
@@ -562,11 +575,11 @@ function renderTest() {
   if (LIST[st]) {
     const list = T.picks[st], q = list[T.qi];
     const script = st === 'p3' ? 'We\'ve been talking about ' + topic + ' and I\'d like to discuss with you one or two more general questions related to this.' : SCRIPT[st];
-    body = '<div class="text-xs muted italic">' + esc(script) + '</div>' +
+    body = '<div class="exm text-xs muted italic">' + esc(script) + '</div>' +
       '<div class="card p-6 min-h-[12rem] flex items-center"><div class="qtext">' + esc(q) + '</div></div>' +
-      '<div class="text-center text-xs muted">Question ' + (T.qi + 1) + ' of ' + list.length + '</div>';
+      '<div class="exm text-center text-xs muted">Question ' + (T.qi + 1) + ' of ' + list.length + '</div>';
     foot = '<button class="btn btn-lg" data-act="tBack">' + ic('back', 18) + '</button>' +
-      (st !== 'p3' && st !== 'intro' ? '<button class="btn btn-lg" data-act="tSwap">' + ic('swap', 18) + ' Swap</button>' : '') +
+      (st !== 'p3' && st !== 'intro' ? '<button class="exm btn btn-lg" data-act="tSwap">' + ic('swap', 18) + ' Swap</button>' : '') +
       '<button class="btn btn-acc btn-lg flex-1" data-act="tNext">' + (T.qi < list.length - 1 ? 'Next question' : 'Continue') + ' ' + ic('next', 18) + '</button>';
   } else if (st === 'p2') {
     const c = T.card;
@@ -574,20 +587,20 @@ function renderTest() {
     let panel = '';
     const timerBox = function (label) { return '<div class="card p-5 text-center space-y-3"><div class="text-xs font-semibold muted uppercase tracking-widest">' + label + '</div><div id="tmDisp" class="timer-disp">' + fmt(TM.left) + '</div><div class="h-2 rounded-full overflow-hidden" style="background:var(--bar-border)"><div id="tmBar" class="h-full accent-bg" style="width:0%"></div></div>'; };
     if (T.p2 === 0) {
-      panel = '<div class="text-xs muted italic">Now I\'m going to give you a topic and I\'d like you to talk about it for one to two minutes. Before you talk, you\'ll have one minute to think about what you\'re going to say. You can make some notes if you wish. Here\'s some paper and a pencil for making notes, and here\'s your topic.</div>' + card +
+      panel = '<div class="exm text-xs muted italic">Now I\'m going to give you a topic and I\'d like you to talk about it for one to two minutes. Before you talk, you\'ll have one minute to think about what you\'re going to say. You can make some notes if you wish. Here\'s some paper and a pencil for making notes, and here\'s your topic.</div>' + card +
         '<button class="btn btn-acc btn-lg w-full" data-act="p2Prep">' + ic('play', 18) + ' Start 1-minute preparation</button>';
     } else if (T.p2 === 1) {
       panel = card + timerBox('Preparation time — student makes notes') + '<div class="flex gap-2 justify-center"><button class="btn" data-act="tmToggle">' + ic(TM.running ? 'pause' : 'play', 16) + ' ' + (TM.running ? 'Pause' : 'Resume') + '</button><button class="btn" data-act="p2Skip">Skip prep</button></div></div>';
     } else if (T.p2 === 2) {
-      panel = card + '<div class="card p-4 text-center flash" style="border-color:var(--accent-color)"><div class="font-bold accent-text">Preparation time is up</div><div class="text-xs muted pt-1">All right? Remember, you have one to two minutes for this, so don\'t worry if I stop you. I\'ll tell you when the time is up. Can you start speaking now, please?</div></div>' +
+      panel = card + '<div class="card p-4 text-center flash" style="border-color:var(--accent-color)"><div class="font-bold accent-text">Preparation time is up</div><div class="exm text-xs muted pt-1">All right? Remember, you have one to two minutes for this, so don\'t worry if I stop you. I\'ll tell you when the time is up. Can you start speaking now, please?</div></div>' +
         '<button class="btn btn-acc btn-lg w-full" data-act="p2Talk">' + ic('play', 18) + ' Start 2-minute talk</button>';
     } else if (T.p2 === 3) {
       panel = card + timerBox('Student is speaking') + '<div class="flex gap-2 justify-center"><button class="btn" data-act="tmToggle">' + ic(TM.running ? 'pause' : 'play', 16) + ' ' + (TM.running ? 'Pause' : 'Resume') + '</button><button class="btn" data-act="p2Done">Stop early</button></div></div>';
     } else {
-      panel = card + '<div class="card p-4 text-center flash" style="border-color:var(--accent-color)"><div class="font-bold accent-text">Time is up</div><div class="text-xs muted pt-1">Thank you. (Optionally ask one rounding-off question about the topic.)</div></div>';
+      panel = card + '<div class="card p-4 text-center flash" style="border-color:var(--accent-color)"><div class="font-bold accent-text">Time is up</div><div class="exm text-xs muted pt-1">Thank you. (Optionally ask one rounding-off question about the topic.)</div></div>';
     }
     body = panel;
-    foot = '<button class="btn btn-lg" data-act="tBack">' + ic('back', 18) + '</button>' + (T.p2 === 0 ? '<button class="btn btn-lg" data-act="tSwapCard">' + ic('swap', 18) + ' New card</button>' : '') +
+    foot = '<button class="btn btn-lg" data-act="tBack">' + ic('back', 18) + '</button>' + (T.p2 === 0 ? '<button class="exm btn btn-lg" data-act="tSwapCard">' + ic('swap', 18) + ' New card</button>' : '') +
       '<button class="btn ' + (T.p2 === 4 ? 'btn-acc' : '') + ' btn-lg flex-1" data-act="tNext">Part 3 ' + ic('next', 18) + '</button>';
   } else {
     const band = calcBand(T.scores);
@@ -597,7 +610,12 @@ function renderTest() {
       '<textarea id="tNotes" class="inp" rows="3" placeholder="Examiner notes (optional)">' + esc(T.notes) + '</textarea>';
     foot = '<button class="btn btn-lg" data-act="tBack">' + ic('back', 18) + '</button><button class="btn btn-acc btn-lg flex-1" data-act="saveRes">' + ic('check', 18) + ' Save result</button>';
   }
-  el.innerHTML = '<div class="border-b bb px-4 pt-3 pb-2 app-header" style="padding-top:calc(.75rem + env(safe-area-inset-top))"><div class="flex items-center justify-between gap-2"><div class="min-w-0"><div class="font-bold text-sm truncate">' + esc(T.name) + '</div><div class="text-[11px] muted truncate">' + esc(T.cname) + ' · ' + esc(T.rlabel) + ' · Band ' + T.band + '</div></div><button class="btn" data-act="tExit" aria-label="Exit test">' + ic('x', 16) + '</button></div><div class="flex gap-1 pt-2">' + prog + '</div><div class="text-[11px] font-semibold accent-text pt-1">' + STEP_LABEL[st] + '</div></div>' +
+  el.classList.toggle('sv', sv);
+  if (sv && st === 'score') {
+    body = '<div class="card p-8 text-center space-y-3"><div class="text-2xl font-bold accent-text">Thank you!</div><div class="muted text-sm">Your speaking test is finished. Please wait for your examiner.</div></div>';
+    foot = '<button class="btn btn-acc btn-lg flex-1" data-act="svOff">' + ic('lock', 18) + ' Examiner: unlock</button>';
+  }
+  el.innerHTML = '<div class="border-b bb px-4 pt-3 pb-2 app-header" style="padding-top:calc(.75rem + env(safe-area-inset-top))"><div class="flex items-center justify-between gap-2"><div class="exm min-w-0"><div class="font-bold text-sm truncate">' + esc(T.name) + '</div><div class="text-[11px] muted truncate">' + esc(T.cname) + ' · ' + esc(T.rlabel) + ' · Band ' + T.band + '</div></div><div class="exm flex gap-2"><button class="btn" data-act="svOn" aria-label="Student view">' + ic('screen', 16) + '</button><button class="btn" data-act="tExit" aria-label="Exit test">' + ic('x', 16) + '</button></div><button class="stu btn ml-auto" data-act="svOff" aria-label="Examiner unlock">' + ic('lock', 16) + '</button></div><div class="flex gap-1 pt-2">' + prog + '</div><div class="text-[11px] font-semibold accent-text pt-1">' + STEP_LABEL[st] + '</div></div>' +
     '<div class="flex-1 overflow-y-auto"><div class="max-w-2xl mx-auto w-full p-4 space-y-4">' + body + '</div></div>' +
     '<div class="border-t bb p-3 flex gap-2 max-w-2xl mx-auto w-full" style="background:var(--nav-bg);max-width:none;padding-bottom:calc(.75rem + env(safe-area-inset-bottom))"><div class="flex gap-2 w-full max-w-2xl mx-auto">' + foot + '</div></div>';
   if (st === 'p2') tmDraw();
@@ -632,6 +650,24 @@ function download(name, text, type) {
 function csvCell(v) { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
 
 const ACT = {
+  roleExaminer: function () { askPin(function () { hideLanding(); if (T && T.sv) { T.sv = false; renderTest(); } }, 'Examiner PIN'); },
+  roleStudent: function () { if (T) { T.sv = true; hideLanding(); renderTest(); } else showLanding(true); },
+  landBack: function () { showLanding(); },
+  lockApp: function () { closeSheet(); showLanding(); },
+  svOn: function () { T.sv = true; renderTest(); },
+  svOff: function () { askPin(function () { T.sv = false; renderTest(); }, 'Examiner PIN'); },
+  pinOk: function () {
+    const i = $('#pinInp'); if (!i) return;
+    if (hashPin(i.value.trim()) === S.settings.pin) { closePin(); const f = PINCB; PINCB = null; if (f) f(); }
+    else { $('#pinErr').textContent = 'Wrong PIN'; i.value = ''; i.focus(); }
+  },
+  pinCancel: function () { PINCB = null; closePin(); },
+  setPin: function () {
+    const v = ($('#pinNew').value || '').trim();
+    if (!/^\d{4,8}$/.test(v)) { toast('PIN must be 4-8 digits'); return; }
+    S.settings.pin = hashPin(v); save(); showSettings(); toast('PIN saved');
+  },
+  clearPin: function () { S.settings.pin = ''; save(); showSettings(); toast('PIN removed'); },
   tab: function (d) { S.ui.tab = d.v; save(); render(); },
   toggleClass: function (d) { S.ui.open[d.id] = !S.ui.open[d.id]; save(); render(); },
   newClass: function () { classModal(); },
@@ -776,13 +812,37 @@ document.addEventListener('click', function (e) {
 document.addEventListener('change', function (e) { const t = e.target.closest('[data-chg]'); if (t && CHG[t.dataset.chg]) CHG[t.dataset.chg](t); });
 document.addEventListener('input', function (e) { if (e.target.id === 'tNotes' && T) T.notes = e.target.value; });
 window.addEventListener('online', flush);
+document.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target && e.target.id === 'pinInp') ACT.pinOk(); });
 document.addEventListener('visibilitychange', function () { if (T && document.visibilityState === 'visible') wake(); });
+
+/* ============================== LANDING / PIN / STUDENT VIEW ============================== */
+function hashPin(p) { let h = 2166136261; const s = 'ist|' + p; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36); }
+let PINCB = null;
+function closePin() { const el = $('#pinBox'); el.classList.add('hidden'); el.innerHTML = ''; }
+function askPin(cb, title) {
+  if (!S.settings.pin) { cb(); return; }
+  PINCB = cb;
+  const el = $('#pinBox');
+  el.innerHTML = '<div class="card w-full max-w-xs p-5 space-y-3 text-center"><div class="accent-text flex justify-center">' + ic('lock', 30) + '</div><div class="font-bold">' + esc(title || 'Examiner PIN') + '</div><input id="pinInp" type="password" inputmode="numeric" autocomplete="off" maxlength="8" class="inp text-center text-lg" style="letter-spacing:.4em" placeholder="PIN"><div id="pinErr" class="text-xs h-4" style="color:#f87171"></div><div class="flex gap-2"><button class="btn flex-1" data-act="pinCancel">Cancel</button><button class="btn btn-acc flex-1" data-act="pinOk">Unlock</button></div></div>';
+  el.classList.remove('hidden');
+  setTimeout(function () { const i = $('#pinInp'); if (i) i.focus(); }, 60);
+}
+function hideLanding() { const el = $('#landing'); el.classList.add('hidden'); el.innerHTML = ''; }
+function showLanding(student) {
+  const el = $('#landing'); el.classList.remove('hidden');
+  if (student) {
+    el.innerHTML = '<div class="w-full max-w-sm text-center space-y-5"><img src="small-icon.png" data-emb="sm" alt="" class="w-20 h-20 mx-auto rounded-full object-cover border bb" /><h2 class="text-xl font-bold">Welcome!</h2><p class="text-sm muted">Please wait. Your examiner will start your speaking test soon.</p><button class="btn" data-act="landBack">' + ic('back', 16) + ' Back</button></div>';
+  } else {
+    el.innerHTML = '<div class="w-full max-w-sm text-center space-y-6"><img src="icon.png" data-emb="lg" alt="IST Assist" class="w-44 h-44 mx-auto rounded-3xl object-cover border-2 bb shadow-lg" /><div><h1 class="text-2xl font-extrabold tracking-tight accent-text">IST ASSIST</h1><p class="text-xs muted pt-1">IELTS Speaking Test Assistant</p></div><div class="space-y-3"><button class="btn btn-acc btn-lg w-full" data-act="roleExaminer">' + ic('edit', 20) + ' I am the Examiner</button><button class="btn btn-lg w-full" data-act="roleStudent">' + ic('mic', 20) + ' I am a Student</button></div><p class="text-[10px] font-mono muted uppercase tracking-widest pt-2">Made by REAPER-357</p></div>';
+  }
+  fixImgs(el);
+}
 
 /* ============================== INIT ============================== */
 window.addEventListener('DOMContentLoaded', function () {
   setAccentColor(S.settings.accent);
   setAppTheme(S.settings.theme);
-  hydrate(); fixImgs(); render(); flush();
+  hydrate(); fixImgs(); render(); flush(); showLanding();
   if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) navigator.serviceWorker.register('sw.js').catch(function () {});
 });
 </script>
