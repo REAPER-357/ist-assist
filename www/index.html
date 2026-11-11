@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en" class="dark" data-theme="black">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>IST Assist - IELTS Speaking Test Assistant</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <style>
+        :root {
+            --accent-color: #10b981;
+            --page-bg: #000000;
+            --page-fg: #f1f5f9;
+            --panel-bg: #18181b;
+            --inp-bg: #09090b;
+            --bar-bg: rgba(0, 0, 0, 0.95);
+            --nav-bg: #09090b;
+            --bar-border: #27272a;
+            --muted: #a1a1aa;
+        }
+        [data-theme="dark"] {
+            --page-bg: #0f172a; --panel-bg: #1e293b; --inp-bg: #0b1220;
+            --bar-bg: rgba(15, 23, 42, 0.95); --nav-bg: #020617; --bar-border: #334155; --muted: #94a3b8;
+        }
+        [data-theme="light"] {
+            --page-bg: #f1f5f9; --page-fg: #1e293b; --panel-bg: #ffffff; --inp-bg: #f8fafc;
+            --bar-bg: rgba(255, 255, 255, 0.95); --nav-bg: #e2e8f0; --bar-border: #cbd5e1; --muted: #64748b;
+        }
+        body { background-color: var(--page-bg); color: var(--page-fg); -webkit-tap-highlight-color: transparent; }
+        .app-header { background-color: var(--bar-bg); border-color: var(--bar-border); }
+        .accent-text { color: var(--accent-color) !important; }
+        .accent-bg { background-color: var(--accent-color) !important; }
+        .card { background: var(--panel-bg); border: 1px solid var(--bar-border); border-radius: 1.25rem; }
+        .inp { width: 100%; background: var(--inp-bg); border: 1px solid var(--bar-border); color: var(--page-fg); border-radius: .75rem; padding: .6rem .75rem; font-size: .85rem; outline: none; }
+        .inp:focus { border-color: var(--accent-color); }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; border-radius: .75rem; padding: .55rem .9rem; font-size: .8rem; font-weight: 600; border: 1px solid var(--bar-border); background: var(--panel-bg); color: var(--page-fg); transition: transform .08s; }
+        .btn:active { transform: scale(.96); }
+        .btn-acc { background: var(--accent-color); border-color: var(--accent-color); color: #fff; }
+        .btn-danger { color: #f87171; }
+        .btn-lg { padding: .9rem 1.2rem; font-size: .95rem; border-radius: 1rem; }
+        .muted { color: var(--muted); }
+        .chip { display: inline-block; font-size: 10px; font-weight: 600; padding: .15rem .5rem; border-radius: 999px; border: 1px solid var(--bar-border); color: var(--muted); }
+        .chip.on { background: var(--accent-color); border-color: var(--accent-color); color: #fff; }
+        .ic { flex: none; display: inline-block; vertical-align: middle; }
+        .chev { transition: transform .2s; display: inline-flex; }
+        .rot { transform: rotate(180deg); }
+        .bb { border-color: var(--bar-border); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        input[type=checkbox], input[type=radio] { accent-color: var(--accent-color); }
+        .navbtn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: .55rem 0; font-size: 10px; font-weight: 600; color: var(--muted); }
+        .navbtn.on { color: var(--accent-color); }
+        .timer-disp { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 4.5rem; font-weight: 800; line-height: 1; letter-spacing: -.02em; }
+        .qtext { font-size: 1.5rem; line-height: 1.35; font-weight: 700; }
+        @keyframes pulse2 { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
+        .flash { animation: pulse2 .5s 6; }
+    </style>
+</head>
+<body id="appBody" class="min-h-screen flex flex-col font-sans transition-colors duration-200 select-none pb-24">
+
+    <!-- TOP HEADER -->
+    <header id="appHeader" class="app-header sticky top-0 z-30 backdrop-blur-md border-b px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <img src="small-icon.png" data-emb="sm" alt="Logo" class="w-9 h-9 rounded-full object-cover border shadow-sm bb" />
+            <div>
+                <h1 id="appTitleHeader" class="text-base font-bold tracking-tight leading-none accent-text">IST ASSIST</h1>
+                <p class="text-[10px] muted font-medium">IELTS Speaking Test Assistant</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button id="openSettingsBtn" data-act="settings" aria-label="Open settings" class="p-2.5 rounded-xl hover:opacity-70 transition"><span data-i="gear" data-s="22"></span></button>
+        </div>
+    </header>
+
+    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 z-[80] hidden px-4 py-2 rounded-xl text-xs font-medium shadow-xl border max-w-[90vw] text-center bb" style="background:var(--panel-bg);color:var(--page-fg)"></div>
+
+    <main id="view" class="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 space-y-4"></main>
+
+    <footer class="py-4 text-center">
+        <p class="text-[10px] font-mono tracking-widest muted uppercase">Made by REAPER-357</p>
+    </footer>
+
+    <!-- BOTTOM NAV -->
+    <nav class="fixed bottom-0 inset-x-0 z-30 flex border-t" style="background:var(--nav-bg);border-color:var(--bar-border);padding-bottom:env(safe-area-inset-bottom)">
+        <button class="navbtn" id="navClasses" data-act="tab" data-v="classes"><span data-i="users" data-s="22"></span>Classes</button>
+        <button class="navbtn" id="navResults" data-act="tab" data-v="results"><span data-i="chart" data-s="22"></span>Results</button>
+    </nav>
+
+    <!-- SHEET (settings, forms, question bank) -->
+    <div id="sheet" class="fixed inset-0 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4" style="background:rgba(0,0,0,.75)"></div>
+
+    <!-- TEST VIEW -->
+    <div id="testView" class="fixed inset-0 z-[55] hidden flex flex-col" style="background:var(--page-bg)"></div>
+
+<script>
+/* ============================== ICONS (inline SVG, no network) ============================== */
+const P = {
+  gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/><circle cx="12" cy="12" r="7"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.2c2.6.2 4.5 2 4.5 5"/>',
+  chart:'<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>',
+  mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/>',
+  play:'<path d="M7 4.5l12 7.5-12 7.5z" fill="currentColor"/>',
+  pause:'<path d="M8 5v14M16 5v14"/>',
+  reset:'<path d="M4 12a8 8 0 112.5 5.8"/><path d="M4 5v7h7"/>',
+  check:'<path d="M4 12l5 5L20 6"/>',
+  x:'<path d="M5 5l14 14M19 5L5 19"/>',
+  chev:'<path d="M6 9l6 6 6-6"/>',
+  edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+  trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+  cloud:'<path d="M7 18a4.5 4.5 0 01-.5-9A6 6 0 0118 10a4 4 0 010 8z"/>',
+  download:'<path d="M12 4v11M7 11l5 5 5-5M4 20h16"/>',
+  upload:'<path d="M12 16V5M7 9l5-5 5 5M4 20h16"/>',
+  swap:'<path d="M4 8h14l-3-3M20 16H6l3 3"/>',
+  back:'<path d="M15 5l-7 7 7 7"/>',
+  next:'<path d="M9 5l7 7-7 7"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3"/>',
+  list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+  book:'<path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 21h15"/>',
+  volume:'<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 010 6"/>',
+  eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  eyeoff:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/>'
+};
+function ic(n, s) { s = s || 20; return '<svg class="ic" width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (P[n] || '') + '</svg>'; }
+function hydrate() { document.querySelectorAll('[data-i]').forEach(function (el) { el.innerHTML = ic(el.dataset.i, +el.dataset.s || 20); }); }
+
+/* Emblem fallback (inline SVG) if icon.png / small-icon.png are not present */
+function emblem(large) {
+  const svg = large
+    ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><rect width="256" height="256" rx="48" fill="#09090b"/><rect x="8" y="8" width="240" height="240" rx="42" fill="none" stroke="#10b981" stroke-width="4"/><path d="M60 60h136a14 14 0 0114 14v72a14 14 0 01-14 14h-70l-34 28v-28H60a14 14 0 01-14-14V74a14 14 0 0114-14z" fill="none" stroke="#10b981" stroke-width="8" stroke-linejoin="round"/><text x="128" y="132" font-family="Arial,Helvetica,sans-serif" font-size="52" font-weight="800" fill="#f1f5f9" text-anchor="middle">IST</text><text x="128" y="206" font-family="Arial,Helvetica,sans-serif" font-size="30" font-weight="800" fill="#10b981" text-anchor="middle" letter-spacing="4">ASSIST</text><text x="128" y="230" font-family="Arial,Helvetica,sans-serif" font-size="11" fill="#a1a1aa" text-anchor="middle">IELTS Speaking Test Assistant</text></svg>'
+    : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="32" fill="#09090b"/><circle cx="32" cy="32" r="29" fill="none" stroke="#10b981" stroke-width="3"/><text x="32" y="40" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="800" fill="#10b981" text-anchor="middle">IST</text></svg>';
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+function fixImgs(root) {
+  (root || document).querySelectorAll('img[data-emb]').forEach(function (img) {
+    const big = img.dataset.emb === 'lg';
+    const fb = function () { img.onerror = null; img.src = emblem(big); };
+    img.addEventListener('error', fb, { once: true });
+    if (img.complete && img.naturalWidth === 0) fb();
+  });
+}
+
+/* ============================== QUESTION BANK (built-in seed) ============================== */
+function C(t, b, f) { return { t: t, b: b, f: f }; }
+const BK = {
+  warm: [
+    "How are you today?","How did you get to school today?","Did you have breakfast this morning?","What did you have for breakfast?","What time did you get up today?",
+    "How was your weekend?","What's the weather like today?","Did you sleep well last night?","Are you feeling a bit nervous?","What did you do last night?",
+    "What's your favourite subject at school?","Have you had a good week so far?","What are you going to do after class today?","Did you do anything fun yesterday?","How are you feeling about the test?",
+    "Did you study for today's test?","What did you eat for lunch yesterday?","What's your favourite day of the week?","Did you watch any TV last night?","How long have you been studying English?",
+    "What time did you go to bed last night?","Is it hot in the classroom today?","What are you wearing today?","Do you have any plans for the holidays?","What's your favourite food?",
+    "Who do you sit next to in class?","Did you play any games recently?","What did you do during break time today?","How do you feel when you speak English?","Have you been busy this week?",
+    "What's the best thing that happened this week?","Are you looking forward to the weekend?","Do you have a favourite teacher?","What was the first thing you did this morning?","How was your trip to school this morning?",
+    "Did you help your parents at home this week?","What is your favourite colour?","Do you have any brothers or sisters?","What did you drink this morning?","What kind of music did you listen to this week?",
+    "Did you exercise today?","Do you like the weather today?","Did you talk to your friends before class?","What is your favourite thing to do after school?","What are you having for dinner tonight?",
+    "How many hours did you sleep last night?","Did you finish your homework?","What's something you are looking forward to?","Is there anything you want to ask me before we start?","Are you ready to begin?"
+  ],
+  intro: [
+    "Can you tell me your full name, please?","What shall I call you?","Can I see your identification, please?","Where are you from?","Where do you live at the moment?","Do you work or are you a student?"
+  ],
+  p1: {
+    4: ["Do you live in a house or an apartment?","Who do you live with?","What is your favourite food?","Do you like your school?","What do you do on weekends?","What sports do you like?","Do you have any pets?","What time do you get up every day?","Do you like music? What music do you like?","What is the weather like in your city?","How do you go to school?","Do you like shopping?","What do you do with your friends?","What is your favourite colour?","Do you like watching TV? What shows do you like?"],
+    5: ["Tell me about the place where you live.","What do you like about your hometown?","What do you usually do in the evening?","Why do you like your favourite subject?","Do you prefer to stay at home or go out on weekends? Why?","What kind of food do you eat most often?","How often do you use your phone? What do you use it for?","Tell me about your best friend.","Do you like cooking? Why or why not?","What kind of weather do you like best? Why?","What do you do to relax after school?","Do you often travel? Where do you like to go?","What was your favourite toy when you were young?","Do you enjoy reading? What do you read?","What is your daily routine like?"],
+    6: ["What do you enjoy most about the area where you live?","How has your hometown changed in recent years?","Do you think you spend enough time with your family? Why?","What are the advantages of studying at your school?","How do you usually spend your free time, and has that changed since you were younger?","Do you prefer eating at home or in restaurants? Why?","How important is it for you to exercise regularly?","What kind of transport do you usually use, and why?","Is there anything you would like to change about your daily routine?","How do you keep in touch with friends who live far away?","What kind of music did you enjoy as a child compared to now?","How do you feel about learning English?","Do you think people spend too much time on social media? Why?","What do you usually do on public holidays?","Would you like to live in a different country? Why or why not?"],
+    7: ["What do you think makes a neighbourhood a good place to live?","In what ways has technology changed the way you study?","Do you think it's important to keep traditions alive in your hometown? Why?","How do you decide what to spend your money on?","What role does sport play in your life, and has it always been that way?","Some people say that cooking at home is a dying skill. Would you agree?","How do you cope when you feel stressed about schoolwork?","What do you think about the amount of homework students are given these days?","Do you think it's better to have a few close friends or lots of casual ones?","How would you describe the way people in your country spend their weekends?","What would you say is the biggest challenge of learning a foreign language?","How has your taste in music or films developed over the years?","To what extent do you rely on your phone in your everyday life?","Is there a skill you would like to master, and what's stopping you?","How do you think your city will look in twenty years?"],
+    8: ["What aspects of your upbringing have shaped the person you are today?","To what extent do you feel your hometown has influenced your outlook on life?","How do you strike a balance between your studies and your personal interests?","Do you think people are becoming more or less connected because of technology?","What do you consider to be the most valuable lesson you've learned outside the classroom?","How do you think attitudes towards work and leisure differ between generations?","Would you say that your daily routine reflects your priorities?","What is it about certain places that makes them feel like home?","How far do you think the food people eat reflects their culture?","Can you think of a time when you had to step out of your comfort zone?","In your view, how important is it to preserve local languages and dialects?","What factors influence the way you make important decisions?","How has your attitude towards learning changed as you've grown older?","Is it more rewarding to spend money on experiences or on possessions?","What's your take on the role of social media in shaping young people's opinions?"]
+  },
+  cards: {
+    4: [
+      C("Describe your favourite food.",["what it is","who makes it","when you eat it","and say why you like it"],["Do you like to cook?","What food do children like to eat?","Is food expensive in your country?","Do you eat in restaurants often?"]),
+      C("Describe your best friend.",["who this person is","how you met","what you do together","and say why you like this person"],["Do you have many friends?","Where do people make friends?","Do you talk to your friends every day?","Is it good to have a lot of friends?"]),
+      C("Describe your home.",["where it is","how many rooms it has","what your favourite room is","and say why you like it"],["Do most people live in houses or apartments in your country?","Is it expensive to buy a house?","What kind of home do you want in the future?","Do you want to live in the city or the countryside?"]),
+      C("Describe a place you like to visit.",["where it is","how you get there","what you do there","and say why you like it"],["Do people in your country like to travel?","Do you prefer to travel with family or friends?","What places are popular for tourists?","Is it fun to visit new places?"]),
+      C("Describe an animal you like.",["what animal it is","where you can see it","what it looks like","and say why you like it"],["Do many people have pets in your country?","Why do some people like dogs?","Is it good to keep animals at home?","Do you like going to the zoo?"]),
+      C("Describe a gift you gave to someone.",["what the gift was","who you gave it to","when you gave it","and say why you chose it"],["Do people give gifts often in your country?","What gifts do children like?","Is it good to give money as a gift?","What gift would you like to get?"])
+    ],
+    5: [
+      C("Describe a teacher you remember well.",["who the teacher was","what subject they taught","what they were like","and explain why you remember them"],["What makes a good teacher?","Do students respect teachers in your country?","How is school different now from when your parents were young?","Should students use phones in class?"]),
+      C("Describe a time you were very busy.",["when it was","what you had to do","who was with you","and explain how you felt"],["Do people in your country work too hard?","What do people do to relax when they are busy?","Is it better to be busy or to have a lot of free time?","Do young people have more free time than adults?"]),
+      C("Describe a popular place in your town.",["where it is","what people do there","when it is busy","and explain why it is popular"],["Why do people like to go to busy places?","Are there enough public places for people in your town?","How have places in your town changed?","What would you add to your town?"]),
+      C("Describe a hobby you enjoy.",["what it is","when you started","how often you do it","and explain why you enjoy it"],["Do people have enough time for hobbies?","Why do some people give up their hobbies?","Should schools teach hobbies?","Are hobbies different for young people and old people?"]),
+      C("Describe a family member you spend time with.",["who this person is","what you do together","how often you meet","and explain why you enjoy this time"],["Do families in your country spend a lot of time together?","Why is family time important?","How has family life changed over time?","Do young people prefer family or friends?"]),
+      C("Describe a festival in your country.",["what it is","when it happens","what people do","and explain why it is important"],["Do young people still enjoy traditional festivals?","How do people prepare for festivals?","Do festivals help the economy?","Are festivals the same as they were in the past?"])
+    ],
+    6: [
+      C("Describe a book you have read and enjoyed.",["what the book was","what it was about","when you read it","and explain why you enjoyed it"],["Do you think people read less these days? Why?","What are the advantages of e-books over paper books?","Should children be encouraged to read more?","How can libraries attract young readers?"]),
+      C("Describe a time you helped someone.",["who you helped","how you helped","why they needed help","and explain how you felt afterwards"],["Why do some people not like to ask for help?","Should schools teach students to help others?","Who should help people in need, the government or individuals?","Are people more or less helpful than in the past?"]),
+      C("Describe a memorable trip you took.",["where you went","who you went with","what you did there","and explain why it was memorable"],["Why do people like to travel abroad?","What are the benefits of travelling with a group?","How has tourism changed in your country?","Can travelling be bad for the environment?"]),
+      C("Describe a person you admire.",["who this person is","how you know about them","what they have done","and explain why you admire them"],["What qualities do people admire in others?","Are celebrities good role models for young people?","Do you think parents are the most important role models?","How do role models change as people get older?"]),
+      C("Describe a piece of technology you use every day.",["what it is","how long you have had it","what you use it for","and explain why it is important to you"],["How has technology changed the way people communicate?","Do you think people depend too much on technology?","What are the dangers of technology for children?","How might technology change education in the future?"]),
+      C("Describe a time you learned something new.",["what you learned","who taught you","how long it took","and explain how you felt about it"],["Is it easier for children or adults to learn new things?","What is the best way to learn a new skill?","Do people learn more in school or from life experience?","Why do some people give up learning something new?"])
+    ],
+    7: [
+      C("Describe a time when you had to wait for something important.",["what you were waiting for","how long you waited","what you did while waiting","and explain how you felt about waiting"],["Why do some people find waiting more difficult than others?","Do you think people are less patient than they used to be?","In what situations is waiting actually a good thing?","How has technology reduced the amount of time people spend waiting?"]),
+      C("Describe a skill you would like to learn.",["what the skill is","how you would learn it","how long it might take","and explain why you want to learn it"],["What skills do you think will be most valuable in the future?","Should schools focus more on practical skills than academic ones?","Is it ever too late to learn a new skill?","How can employers encourage workers to develop new skills?"]),
+      C("Describe a memorable meal you had.",["where you had it","who you were with","what you ate","and explain why it was memorable"],["How important is it for families to eat together?","Do you think traditional cooking is disappearing?","What role does food play in the culture of a country?","Are eating habits healthier or worse than in the past?"]),
+      C("Describe an interesting building you have seen.",["where it is","what it looks like","what it is used for","and explain why you find it interesting"],["Should old buildings be preserved or replaced by new ones?","How does the design of a building affect the people who use it?","Do you think modern cities are becoming too similar?","Who should decide what is built in a city?"]),
+      C("Describe a decision you made that changed something important.",["what the decision was","when you made it","who influenced you","and explain how it changed things"],["Do you think people make better decisions alone or with others?","What makes it difficult to make big decisions?","Should young people be allowed to make decisions about their education?","How do you think decision-making differs between generations?"]),
+      C("Describe a time you felt proud of yourself.",["what you did","when it happened","who knew about it","and explain why you felt proud"],["Is it important to feel proud of your achievements?","Do you think people today are more or less competitive?","How should parents praise their children?","Can too much pride be a bad thing?"])
+    ],
+    8: [
+      C("Describe a challenging goal you achieved.",["what the goal was","why it was difficult","how you achieved it","and explain what you learned from the experience"],["To what extent does success depend on talent rather than effort?","Why do some people give up when they face difficulties?","How can society support people who set ambitious goals?","Do you think failure is a necessary part of success?"]),
+      C("Describe a time when you disagreed with someone.",["who you disagreed with","what it was about","how you resolved it","and explain what you learned from it"],["Is it healthy for people to disagree openly?","How do cultural differences affect the way people handle conflict?","Should schools teach students how to debate?","Has social media made disagreements more or less constructive?"]),
+      C("Describe a public space you think is well designed.",["where it is","what it looks like","how people use it","and explain why you think it is well designed"],["What makes a public space successful?","How should city planners balance green spaces and development?","Do public spaces help build a sense of community?","How might public spaces change over the next few decades?"]),
+      C("Describe a piece of advice that has stayed with you.",["what the advice was","who gave it to you","when you received it","and explain why it has stayed with you"],["Why do people sometimes ignore good advice?","Is advice from older people always more valuable?","How has the internet changed the way people seek advice?","Should people follow advice or trust their own instincts?"]),
+      C("Describe a time when technology let you down at an important moment.",["what happened","what you were trying to do","how you dealt with it","and explain what you would do differently"],["Are people too dependent on technology in their daily lives?","What risks come with a society that relies heavily on technology?","Should there be limits on how much technology children use?","How can people prepare for technology failures?"]),
+      C("Describe a family tradition you would like to keep.",["what the tradition is","how it started","who takes part","and explain why you want to keep it"],["Why are traditions important to a society?","Do you think globalisation is threatening local traditions?","Can new traditions replace old ones meaningfully?","What responsibility do younger generations have to preserve culture?"])
+    ]
+  }
+};
+const BANDS = [4, 5, 6, 7, 8];
+
+/* ============================== STATE ============================== */
+const LS = 'ist_assist_v1';
+function defaults() {
+  return {
+    classes: [], rounds: [], results: [], queue: [], hidden: {}, used: {},
+    custom: { warm: [], intro: [], p1: {}, cards: {} },
+    ui: { tab: 'classes', open: {}, round: {}, rclass: '', ropen: {} },
+    settings: { theme: 'black', accent: '#10b981', mode: 'own', nWarm: 3, nP1: 4, nP3: 4, sound: true, fullBand: 9, webhook: '', lastBand: 6 }
+  };
+}
+let S = defaults();
+try {
+  const raw = JSON.parse(localStorage.getItem(LS) || 'null');
+  if (raw) { S = Object.assign(defaults(), raw); S.settings = Object.assign(defaults().settings, raw.settings || {}); S.ui = Object.assign(defaults().ui, raw.ui || {}); S.custom = Object.assign(defaults().custom, raw.custom || {}); }
+} catch (e) {}
+function save() { try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) { toast('Storage full or blocked'); } }
+
+/* ============================== HELPERS ============================== */
+const $ = function (s) { return document.querySelector(s); };
+const esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+const uid = function () { return Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-3); };
+const shuffle = function (a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
+function today() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function monthKey() { return today().slice(0, 7); }
+function monthLabel(m) { if (!m) return ''; const p = m.split('-'); try { return new Date(+p[0], +p[1] - 1, 1).toLocaleDateString('en', { month: 'short', year: 'numeric' }); } catch (e) { return m; } }
+const fmt = function (s) { return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+let toastTimer = null;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.add('hidden'); }, 2600); }
+function pct(band) { return Math.min(100, Math.round(band / (S.settings.fullBand || 9) * 100)); }
+function calcBand(sc) { const avg = (sc.fc + sc.lr + sc.gra + sc.pr) / 4; return Math.round(avg * 2) / 2; }
+function parseNames(t) {
+  const seen = new Set(), out = [];
+  String(t || '').split(/\r?\n/).forEach(function (l) {
+    const n = l.split('\t').map(function (x) { return x.trim(); }).filter(Boolean).join(' ').replace(/^\d+[\.\)\-:]?\s+/, '').trim();
+    if (n && !seen.has(n.toLowerCase())) { seen.add(n.toLowerCase()); out.push(n); }
+  });
+  return out;
+}
+function roundsOf(cid) { return S.rounds.filter(function (r) { return r.classId === cid; }).sort(function (a, b) { return a.created - b.created; }); }
+function curRound(c) { const rs = roundsOf(c.id); return rs.find(function (r) { return r.id === S.ui.round[c.id]; }) || rs[rs.length - 1] || null; }
+function resFor(sid, rid) { return S.results.find(function (r) { return r.studentId === sid && r.roundId === rid; }); }
+
+/* ============================== THEME ============================== */
+function setAccentColor(hex) { S.settings.accent = hex; save(); document.documentElement.style.setProperty('--accent-color', hex); }
+function setAppTheme(theme) {
+  if (['black', 'dark', 'light'].indexOf(theme) < 0) theme = 'black';
+  S.settings.theme = theme; save();
+  document.documentElement.setAttribute('data-theme', theme);
+  document.documentElement.classList.toggle('dark', theme !== 'light');
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', { black: '#000000', dark: '#0f172a', light: '#f1f5f9' }[theme]);
+}
+
+/* ============================== QUESTION BANK ACCESS ============================== */
+function items(kind, band) {
+  let built, cust;
+  if (kind === 'warm') { built = BK.warm; cust = S.custom.warm; }
+  else if (kind === 'intro') { built = BK.intro; cust = S.custom.intro; }
+  else if (kind === 'p1') { built = BK.p1[band] || []; cust = S.custom.p1[band] || []; }
+  else { built = BK.cards[band] || []; cust = S.custom.cards[band] || []; }
+  const b = (kind === 'p1' || kind === 'cards') ? band : 0;
+  const mk = function (x, builtin, i) { const id = kind + '|' + b + '|' + (kind === 'cards' ? x.t : x); return { x: x, builtin: builtin, i: i, id: id, hidden: !!S.hidden[id] }; };
+  return built.map(function (x, i) { return mk(x, true, i); }).concat(cust.map(function (x, i) { return mk(x, false, i); }));
+}
+function active(kind, band) { return items(kind, band).filter(function (o) { return !o.hidden; }).map(function (o) { return o.x; }); }
+function pickFresh(poolKey, arr, n, keyFn) {
+  keyFn = keyFn || function (x) { return x; };
+  if (!arr.length) return [];
+  S.used[poolKey] = S.used[poolKey] || [];
+  const used = S.used[poolKey];
+  let chosen = shuffle(arr.filter(function (i) { return used.indexOf(keyFn(i)) < 0; })).slice(0, n);
+  if (chosen.length < n) {
+    S.used[poolKey] = chosen.map(keyFn);
+    const keys = S.used[poolKey];
+    const rest = shuffle(arr.filter(function (i) { return keys.indexOf(keyFn(i)) < 0; })).slice(0, n - chosen.length);
+    chosen = chosen.concat(rest);
+    rest.forEach(function (i) { S.used[poolKey].push(keyFn(i)); });
+  } else { chosen.forEach(function (i) { used.push(keyFn(i)); }); }
+  save();
+  return chosen;
+}
+
+/* ============================== SOUND / TIMER ============================== */
+let AC = null;
+function ensureAC() { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); } catch (e) {} }
+function beep() {
+  try { if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]); } catch (e) {}
+  if (!S.settings.sound || !AC) return;
+  const t = AC.currentTime;
+  for (let i = 0; i < 3; i++) {
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = 'sine'; o.frequency.value = 988; o.connect(g); g.connect(AC.destination);
+    const s = t + i * 0.4;
+    g.gain.setValueAtTime(0.0001, s); g.gain.exponentialRampToValueAtTime(0.5, s + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, s + 0.25);
+    o.start(s); o.stop(s + 0.3);
+  }
+}
+let TM = { total: 0, left: 0, running: false, end: 0, iv: null, onDone: null };
+function tmStop() { clearInterval(TM.iv); TM.iv = null; TM.running = false; }
+function tmDraw() {
+  const d = $('#tmDisp'); if (d) d.textContent = fmt(TM.left);
+  const b = $('#tmBar'); if (b) b.style.width = (TM.total ? (100 * (TM.total - TM.left) / TM.total) : 0) + '%';
+}
+function tmTick() {
+  if (!TM.running) return;
+  TM.left = Math.max(0, Math.ceil((TM.end - Date.now()) / 1000));
+  tmDraw();
+  if (TM.left <= 0) { tmStop(); beep(); const f = TM.onDone; TM.onDone = null; if (f) f(); }
+}
+function tmStart(total, onDone) {
+  tmStop(); ensureAC();
+  TM = { total: total, left: total, running: true, end: Date.now() + total * 1000, iv: null, onDone: onDone };
+  TM.iv = setInterval(tmTick, 200); tmDraw();
+}
+let WL = null;
+async function wake() { try { WL = await navigator.wakeLock.request('screen'); } catch (e) {} }
+function unwake() { try { if (WL) WL.release(); } catch (e) {} WL = null; }
+
+/* ============================== MAIN VIEWS ============================== */
+function render() {
+  $('#view').innerHTML = S.ui.tab === 'results' ? viewResults() : viewClasses();
+  $('#navClasses').classList.toggle('on', S.ui.tab !== 'results');
+  $('#navResults').classList.toggle('on', S.ui.tab === 'results');
+}
+
+function viewClasses() {
+  let h = '<div class="flex items-center justify-between"><h2 class="text-sm font-bold">Classes</h2><button class="btn btn-acc" data-act="newClass">' + ic('plus', 16) + ' New class</button></div>';
+  if (!S.classes.length) {
+    h += '<div class="card p-6 text-center space-y-3"><div class="accent-text flex justify-center">' + ic('users', 38) + '</div><p class="font-bold">No classes yet</p><p class="text-xs muted max-w-xs mx-auto">Create a class (e.g. Grade 7), then paste your student names in, one per line.</p></div>';
+  }
+  S.classes.forEach(function (c) {
+    const rounds = roundsOf(c.id), cur = curRound(c), open = !!S.ui.open[c.id];
+    const done = cur ? c.students.filter(function (s) { return resFor(s.id, cur.id); }).length : 0;
+    h += '<div class="card overflow-hidden"><button class="w-full flex items-center justify-between p-4 text-left" data-act="toggleClass" data-id="' + c.id + '"><div class="min-w-0"><div class="font-bold text-sm truncate">' + esc(c.name) + '</div><div class="text-[11px] muted">' + c.students.length + ' students' + (cur ? ' · ' + esc(cur.label) + ' · Band ' + cur.band + ' · ' + done + '/' + c.students.length + ' done' : '') + '</div></div><span class="chev ' + (open ? 'rot' : '') + '">' + ic('chev', 18) + '</span></button>';
+    if (open) {
+      h += '<div class="border-t bb p-3 space-y-3"><div class="flex flex-wrap items-center gap-2">';
+      if (rounds.length) {
+        h += '<select class="inp" style="width:auto;max-width:100%" data-chg="round" data-id="' + c.id + '">' + rounds.map(function (r) { return '<option value="' + r.id + '"' + (cur && r.id === cur.id ? ' selected' : '') + '>' + esc(r.label) + ' · ' + monthLabel(r.month) + ' · Band ' + r.band + '</option>'; }).join('') + '</select>';
+      }
+      h += '<button class="btn" data-act="newRound" data-id="' + c.id + '">' + ic('plus', 14) + ' New test</button></div>';
+      if (!cur) h += '<p class="text-xs muted">Set up this month\'s test (choose the target band) to start testing students.</p>';
+      if (!c.students.length) h += '<p class="text-xs muted">No students yet. Tap Edit class to paste names.</p>';
+      c.students.forEach(function (s, i) {
+        const rs = cur && resFor(s.id, cur.id);
+        h += '<div class="flex items-center justify-between gap-2 py-2 border-b bb"><div class="min-w-0"><div class="text-sm font-medium truncate">' + (i + 1) + '. ' + esc(s.name) + '</div><div class="text-[11px] ' + (rs ? 'accent-text' : 'muted') + '">' + (rs ? 'Band ' + rs.band.toFixed(1) + ' · ' + rs.pct + '%' : 'Not tested') + '</div></div>' +
+          (cur ? '<button class="btn ' + (rs ? '' : 'btn-acc') + '" data-act="start" data-sid="' + s.id + '" data-cid="' + c.id + '" data-rid="' + cur.id + '">' + ic(rs ? 'reset' : 'mic', 14) + ' ' + (rs ? 'Retest' : 'Start') + '</button>' : '') + '</div>';
+      });
+      h += '<div class="flex gap-2 pt-1"><button class="btn" data-act="editClass" data-id="' + c.id + '">' + ic('edit', 14) + ' Edit class</button><button class="btn btn-danger" data-act="delClass" data-id="' + c.id + '">' + ic('trash', 14) + ' Delete</button></div></div>';
+    }
+    h += '</div>';
+  });
+  return h;
+}
+
+function viewResults() {
+  if (!S.classes.length) return '<div class="card p-6 text-center space-y-2"><div class="accent-text flex justify-center">' + ic('chart', 38) + '</div><p class="font-bold">No results yet</p><p class="text-xs muted">Create a class and run a test first.</p></div>';
+  const c = S.classes.find(function (x) { return x.id === S.ui.rclass; }) || S.classes[0];
+  const rounds = roundsOf(c.id);
+  let h = '<div class="flex flex-wrap items-center gap-2"><select class="inp" style="width:auto;flex:1" data-chg="rclass">' + S.classes.map(function (x) { return '<option value="' + x.id + '"' + (x.id === c.id ? ' selected' : '') + '>' + esc(x.name) + '</option>'; }).join('') + '</select>' +
+    '<button class="btn" data-act="csv" data-id="' + c.id + '">' + ic('download', 14) + ' CSV</button><button class="btn" data-act="syncClass" data-id="' + c.id + '">' + ic('cloud', 14) + ' Sheets</button></div>';
+  if (rounds.length) {
+    h += '<div class="flex flex-wrap gap-2">' + rounds.map(function (r) {
+      const rs = S.results.filter(function (x) { return x.roundId === r.id; });
+      const avg = rs.length ? (rs.reduce(function (a, b) { return a + b.band; }, 0) / rs.length) : null;
+      return '<span class="chip">' + esc(r.label) + ' · avg ' + (avg == null ? '–' : avg.toFixed(1)) + ' (' + rs.length + '/' + c.students.length + ')</span>';
+    }).join('') + '</div>';
+  } else h += '<p class="text-xs muted">No tests set up for this class yet.</p>';
+  c.students.forEach(function (s, i) {
+    const rs = S.results.filter(function (r) { return r.studentId === s.id; });
+    const open = !!S.ui.ropen[s.id];
+    const avg = rs.length ? rs.reduce(function (a, b) { return a + b.band; }, 0) / rs.length : null;
+    h += '<div class="card overflow-hidden"><button class="w-full flex items-center justify-between p-3 text-left gap-2" data-act="resToggle" data-id="' + s.id + '"><div class="min-w-0"><div class="text-sm font-semibold truncate">' + (i + 1) + '. ' + esc(s.name) + '</div><div class="flex flex-wrap gap-1 pt-1">' +
+      (rounds.map(function (r) { const x = resFor(s.id, r.id); return '<span class="chip ' + (x ? 'on' : '') + '">' + esc(r.label) + ' ' + (x ? x.band.toFixed(1) : '–') + '</span>'; }).join('')) + '</div></div><div class="flex items-center gap-2 flex-none"><span class="text-xs font-bold accent-text">' + (avg == null ? '' : 'Avg ' + avg.toFixed(1)) + '</span><span class="chev ' + (open ? 'rot' : '') + '">' + ic('chev', 16) + '</span></div></button>';
+    if (open) {
+      h += '<div class="border-t bb p-3 space-y-2">';
+      if (!rs.length) h += '<p class="text-xs muted">No results yet.</p>';
+      rounds.forEach(function (r) {
+        const x = resFor(s.id, r.id); if (!x) return;
+        h += '<div class="text-xs space-y-1 pb-2 border-b bb"><div class="flex justify-between"><b>' + esc(r.label) + ' · ' + monthLabel(r.month) + '</b><span class="accent-text font-bold">Band ' + x.band.toFixed(1) + ' · ' + x.pct + '%</span></div><div class="muted">Fluency ' + x.scores.fc + ' · Lexical ' + x.scores.lr + ' · Grammar ' + x.scores.gra + ' · Pron. ' + x.scores.pr + '</div>' +
+          (x.notes ? '<div>' + esc(x.notes) + '</div>' : '') + '<div class="muted">Part 2: ' + esc(x.q.card || '') + '</div><button class="btn btn-danger" data-act="delRes" data-id="' + x.id + '">' + ic('trash', 12) + ' Delete</button></div>';
+      });
+      h += '</div>';
+    }
+    h += '</div>';
+  });
+  return h;
+}
+
+/* ============================== SHEETS & FORMS ============================== */
+function sheet(html) {
+  const el = $('#sheet');
+  el.innerHTML = '<div class="card w-full sm:max-w-lg max-h-[92vh] overflow-y-auto p-5 space-y-4" style="border-radius:1.5rem 1.5rem 0 0">' + html + '</div>';
+  el.classList.remove('hidden'); fixImgs(el);
+}
+function closeSheet() { const el = $('#sheet'); el.classList.add('hidden'); el.innerHTML = ''; }
+function sheetHead(title, back) {
+  return '<div class="flex items-center justify-between"><div class="flex items-center gap-2">' + (back ? '<button class="btn" data-act="' + back + '" aria-label="Back">' + ic('back', 16) + '</button>' : '') + '<h3 class="font-bold text-base">' + title + '</h3></div><button class="btn" data-act="closeSheet" aria-label="Close">' + ic('x', 16) + '</button></div>';
+}
+
+function classModal(id) {
+  const c = id ? S.classes.find(function (x) { return x.id === id; }) : null;
+  sheet(sheetHead(c ? 'Edit class' : 'New class') +
+    '<div class="space-y-1"><label class="text-xs font-semibold muted">Class name</label><input id="cmName" class="inp" placeholder="e.g. Grade 7" value="' + esc(c ? c.name : '') + '"></div>' +
+    '<div class="space-y-1"><label class="text-xs font-semibold muted">Student names (paste a column from Excel/Sheets, one per line)</label><textarea id="cmNames" class="inp" rows="10" placeholder="Sok Dara&#10;Chan Sophea&#10;...">' + esc(c ? c.students.map(function (s) { return s.name; }).join('\n') : '') + '</textarea></div>' +
+    '<button class="btn btn-acc btn-lg w-full" data-act="saveClass" data-id="' + (c ? c.id : '') + '">' + ic('check', 18) + ' Save</button>');
+}
+function roundModal(cid) {
+  const n = roundsOf(cid).length + 1;
+  sheet(sheetHead('New test') +
+    '<div class="space-y-1"><label class="text-xs font-semibold muted">Test name</label><input id="rmLabel" class="inp" value="Test ' + n + '"></div>' +
+    '<div class="space-y-1"><label class="text-xs font-semibold muted">Target band for this class</label><select id="rmBand" class="inp">' + BANDS.map(function (b) { return '<option value="' + b + '"' + (b === S.settings.lastBand ? ' selected' : '') + '>Band ' + b + '</option>'; }).join('') + '</select></div>' +
+    '<div class="space-y-1"><label class="text-xs font-semibold muted">Month</label><input id="rmMonth" type="month" class="inp" value="' + monthKey() + '"></div>' +
+    '<button class="btn btn-acc btn-lg w-full" data-act="saveRound" data-id="' + cid + '">' + ic('check', 18) + ' Create test</button>');
+}
+
+const GAS = [
+  'function doPost(e) {',
+  '  var d = JSON.parse(e.postData.contents);',
+  '  var ss = SpreadsheetApp.getActiveSpreadsheet();',
+  '  var name = String(d["class"] || "Class").replace(/[\\\\\\/\\?\\*\\[\\]:]/g, "-").slice(0, 90);',
+  '  var sh = ss.getSheetByName(name) || ss.insertSheet(name);',
+  '  var head = ["Student","Test","Month","Date","Target Band","Fluency & Coherence","Lexical Resource","Grammatical Range & Accuracy","Pronunciation","Band Score","Percentage","Examiner Notes","Warm-up / Intro Qs","Part 1 Qs","Part 2 Cue Card","Part 3 Qs"];',
+  '  if (sh.getLastRow() === 0) { sh.appendRow(head); sh.setFrozenRows(1); sh.getRange(1,1,1,head.length).setFontWeight("bold"); }',
+  '  var row = [d.student,d.test,d.month,d.date,d.target,d.fc,d.lr,d.gra,d.pr,d.band,d.percent,d.notes,d.warmup,d.part1,d.part2,d.part3];',
+  '  var data = sh.getDataRange().getValues();',
+  '  for (var i = 1; i < data.length; i++) {',
+  '    if (data[i][0] === d.student && data[i][1] === d.test) { sh.getRange(i+1,1,1,row.length).setValues([row]); return ContentService.createTextOutput("ok"); }',
+  '  }',
+  '  sh.appendRow(row);',
+  '  return ContentService.createTextOutput("ok");',
+  '}'
+].join('\n');
+
+function showSettings() {
+  const s = S.settings;
+  const acc = [['#10b981', 'Green'], ['#ef4444', 'Red'], ['#3b82f6', 'Blue'], ['#a855f7', 'Purple'], ['#f59e0b', 'Amber']];
+  sheet(
+    '<div class="text-center space-y-2"><div class="flex justify-end"><button class="btn" data-act="closeSheet" aria-label="Close">' + ic('x', 16) + '</button></div>' +
+    '<img src="icon.png" data-emb="lg" alt="IST Assist" class="w-32 h-32 mx-auto rounded-2xl object-cover border-2 bb shadow-lg" /><h3 class="text-base font-bold">IST Assist</h3><p class="text-xs muted">IELTS Speaking Test Assistant</p></div>' +
+
+    '<div class="space-y-2"><span class="text-xs font-semibold muted">THEME</span><div class="grid grid-cols-3 gap-2">' +
+    [['black', 'Pure Black'], ['dark', 'Dark'], ['light', 'Light']].map(function (t) { return '<button class="btn ' + (s.theme === t[0] ? 'btn-acc' : '') + '" data-act="theme" data-v="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>' +
+    '<div class="flex items-center justify-around pt-1">' + acc.map(function (a) { return '<button aria-label="' + a[1] + ' accent" data-act="accent" data-v="' + a[0] + '" class="w-8 h-8 rounded-full" style="background:' + a[0] + ';outline:' + (s.accent === a[0] ? '2px solid var(--page-fg)' : 'none') + ';outline-offset:2px"></button>'; }).join('') + '</div></div>' +
+
+    '<div class="space-y-2"><span class="text-xs font-semibold muted">EXAMINER MODE</span>' +
+    '<button class="card w-full p-3 text-left ' + (s.mode === 'own' ? 'accent-border' : '') + '" style="' + (s.mode === 'own' ? 'border-color:var(--accent-color)' : '') + '" data-act="mode" data-v="own"><div class="text-sm font-semibold">My own students</div><div class="text-[11px] muted">Friendly warm-up questions (How are you today?). No ID or name questions.</div></button>' +
+    '<button class="card w-full p-3 text-left" style="' + (s.mode === 'outside' ? 'border-color:var(--accent-color)' : '') + '" data-act="mode" data-v="outside"><div class="text-sm font-semibold">Outside examiner</div><div class="text-[11px] muted">Starts with name, ID check, where you live, work or study.</div></button></div>' +
+
+    '<div class="space-y-2"><span class="text-xs font-semibold muted">TEST OPTIONS</span><div class="grid grid-cols-3 gap-2 text-center">' +
+    [['nWarm', 'Warm-up Qs', 0, 8], ['nP1', 'Part 1 Qs', 1, 12], ['nP3', 'Part 3 Qs', 1, 6]].map(function (f) { return '<div><div class="text-[10px] muted pb-1">' + f[1] + '</div><input type="number" class="inp text-center" min="' + f[2] + '" max="' + f[3] + '" value="' + s[f[0]] + '" data-chg="cfgnum" data-k="' + f[0] + '"></div>'; }).join('') + '</div>' +
+    '<div class="flex items-center justify-between gap-2"><label class="text-xs">Percentage = band ÷ <input type="number" class="inp inline-block text-center" style="width:4rem;display:inline-block" min="5" max="9" step="0.5" value="' + s.fullBand + '" data-chg="cfgnum" data-k="fullBand"> × 100</label>' +
+    '<button class="btn" data-act="testSound">' + ic('volume', 14) + ' Beep</button></div>' +
+    '<label class="flex items-center gap-2 text-xs"><input type="checkbox" ' + (s.sound ? 'checked' : '') + ' data-chg="sound"> Play beep sound at end of timers</label></div>' +
+
+    '<div class="space-y-2"><span class="text-xs font-semibold muted">QUESTION BANK</span><button class="btn w-full" data-act="bank">' + ic('book', 16) + ' Edit / add questions</button></div>' +
+
+    '<div class="space-y-2"><span class="text-xs font-semibold muted">GOOGLE SHEETS WEBHOOK</span>' +
+    '<input class="inp" placeholder="https://script.google.com/macros/s/.../exec" value="' + esc(s.webhook) + '" data-chg="webhook">' +
+    '<div class="text-[11px] muted">' + S.queue.length + ' result(s) waiting to send. Results auto-send after each test and retry when you are back online.</div>' +
+    '<div class="flex gap-2"><button class="btn flex-1" data-act="syncAll">' + ic('cloud', 14) + ' Send all results</button><button class="btn flex-1" data-act="copyGas">' + ic('copy', 14) + ' Copy script</button></div>' +
+    '<details class="text-[11px] muted"><summary class="cursor-pointer">Setup steps</summary><ol class="list-decimal pl-5 space-y-1 pt-2"><li>Open a Google Sheet &rarr; Extensions &rarr; Apps Script.</li><li>Paste the copied script, save.</li><li>Deploy &rarr; New deployment &rarr; Web app. Execute as: Me. Access: Anyone.</li><li>Copy the Web app URL into the box above.</li></ol><p class="pt-2">Each class becomes its own sheet tab; each student/test is one row (updated if you retest).</p></details></div>' +
+
+    '<div class="space-y-2"><span class="text-xs font-semibold muted">BACKUP</span><div class="flex gap-2"><button class="btn flex-1" data-act="exportData">' + ic('download', 14) + ' Export</button><label class="btn flex-1 cursor-pointer">' + ic('upload', 14) + ' Import<input type="file" accept=".json,application/json" class="hidden" data-chg="importData"></label></div>' +
+    '<button class="btn btn-danger w-full" data-act="resetAll">' + ic('trash', 14) + ' Erase all app data</button></div>' +
+    '<p class="text-center text-[10px] font-mono muted uppercase tracking-widest">Designed by REAPER-357</p>');
+}
+
+/* ---------- Question bank editor ---------- */
+let B = { kind: 'warm', band: 6 };
+function showBank() {
+  const kinds = [['warm', 'Warm-up'], ['intro', 'Intro / ID'], ['p1', 'Part 1'], ['cards', 'Part 2 + 3']];
+  const hasBand = B.kind === 'p1' || B.kind === 'cards';
+  const list = items(B.kind, B.band);
+  const act = list.filter(function (o) { return !o.hidden; }).length;
+  let h = sheetHead('Question bank', 'settings') +
+    '<div class="flex flex-wrap gap-2">' + kinds.map(function (k) { return '<button class="chip ' + (B.kind === k[0] ? 'on' : '') + '" style="font-size:12px;padding:.3rem .7rem" data-act="bankKind" data-v="' + k[0] + '">' + k[1] + '</button>'; }).join('') + '</div>';
+  if (hasBand) h += '<div class="flex flex-wrap gap-2 items-center"><span class="text-xs muted">Band</span>' + BANDS.map(function (b) { return '<button class="chip ' + (B.band === b ? 'on' : '') + '" style="font-size:12px;padding:.3rem .7rem" data-act="bankBand" data-v="' + b + '">' + b + '</button>'; }).join('') + '</div>';
+  h += '<div class="text-[11px] muted">' + act + ' active of ' + list.length + (B.kind === 'intro' ? ' · used in Outside examiner mode' : B.kind === 'warm' ? ' · used in My own students mode' : '') + '. Eye icon hides a built-in question; trash deletes your own.</div>';
+  if (B.kind === 'cards') {
+    h += '<div class="space-y-2 card p-3"><div class="text-xs font-semibold">Add a cue card (band ' + B.band + ')</div><input id="bkTopic" class="inp" placeholder="Describe a ..."><textarea id="bkBul" class="inp" rows="4" placeholder="You should say (one per line):&#10;where it is&#10;who you went with&#10;and explain why..."></textarea><textarea id="bkFol" class="inp" rows="4" placeholder="Part 3 follow-up questions (one per line)"></textarea><button class="btn btn-acc w-full" data-act="bankAdd">' + ic('plus', 14) + ' Add card</button></div>';
+  } else {
+    h += '<div class="space-y-2 card p-3"><div class="text-xs font-semibold">Add questions (one per line — paste as many as you like)</div><textarea id="bkText" class="inp" rows="4" placeholder="Type or paste questions here"></textarea><button class="btn btn-acc w-full" data-act="bankAdd">' + ic('plus', 14) + ' Add</button></div>';
+  }
+  h += '<div class="space-y-1">' + list.map(function (o, n) {
+    const txt = B.kind === 'cards' ? esc(o.x.t) + ' <span class="muted">(' + o.x.f.length + ' follow-ups)</span>' : esc(o.x);
+    return '<div class="flex items-start justify-between gap-2 py-2 border-b bb ' + (o.hidden ? 'opacity-40' : '') + '"><div class="text-xs min-w-0">' + txt + (o.builtin ? '' : ' <span class="chip on">yours</span>') + '</div><button class="btn flex-none" style="padding:.35rem .5rem" data-act="' + (o.builtin ? 'bankHide' : 'bankDel') + '" data-n="' + n + '" aria-label="' + (o.builtin ? 'Hide/show' : 'Delete') + '">' + ic(o.builtin ? (o.hidden ? 'eyeoff' : 'eye') : 'trash', 14) + '</button></div>';
+  }).join('') + '</div>';
+  sheet(h);
+}
+
+/* ============================== TEST ENGINE ============================== */
+let T = null;
+const LIST = { intro: 1, warm: 1, p1: 1, p3: 1 };
+const STEP_LABEL = { intro: 'Introduction & ID', warm: 'Warm-up (not scored)', p1: 'Part 1 · Interview', p2: 'Part 2 · Long turn', p3: 'Part 3 · Discussion', score: 'Scoring' };
+const CRIT = [['fc', 'Fluency & Coherence', 'Pace, hesitation, linking, development'], ['lr', 'Lexical Resource', 'Range, precision, paraphrase'], ['gra', 'Grammatical Range & Accuracy', 'Structures, complexity, errors'], ['pr', 'Pronunciation', 'Clarity, stress, intonation']];
+
+function startTest(sid, cid, rid) {
+  const c = S.classes.find(function (x) { return x.id === cid; }), rd = S.rounds.find(function (x) { return x.id === rid; });
+  const st = c && c.students.find(function (x) { return x.id === sid; });
+  if (!c || !rd || !st) return;
+  if (resFor(sid, rid) && !confirm('This student already has a result for ' + rd.label + '. Retesting will replace it. Continue?')) return;
+  const o = S.settings, band = rd.band, own = o.mode === 'own';
+  T = { sid: sid, cid: cid, rid: rid, name: st.name, cname: c.name, rlabel: rd.label, band: band, si: 0, qi: 0, picks: {}, card: null, p2: 0, notes: '', scores: { fc: band, lr: band, gra: band, pr: band } };
+  if (own) { if (o.nWarm > 0) T.picks.warm = pickFresh('warm', active('warm'), o.nWarm); }
+  else T.picks.intro = active('intro').slice(0, 6);
+  T.picks.p1 = pickFresh('p1_' + band, active('p1', band), o.nP1);
+  const cards = pickFresh('cards_' + band, active('cards', band), 1, function (x) { return x.t; });
+  T.card = cards[0] || null;
+  if (T.card) T.picks.p3 = T.card.f.slice(0, o.nP3);
+  T.steps = (own ? ['warm'] : ['intro']).concat(['p1'], T.card ? ['p2', 'p3'] : [], ['score']).filter(function (s) { return !LIST[s] || (T.picks[s] && T.picks[s].length); });
+  if (!T.card) toast('No Part 2 cards available for band ' + band + ' — add some in the question bank');
+  ensureAC(); wake();
+  $('#testView').classList.remove('hidden');
+  renderTest();
+}
+function closeTest() { tmStop(); unwake(); T = null; const v = $('#testView'); v.classList.add('hidden'); v.innerHTML = ''; render(); }
+function tNext() {
+  const st = T.steps[T.si];
+  if (LIST[st] && T.qi < T.picks[st].length - 1) { T.qi++; }
+  else { tmStop(); T.si = Math.min(T.si + 1, T.steps.length - 1); T.qi = 0; }
+  renderTest();
+}
+function tBack() {
+  const st = T.steps[T.si];
+  if (LIST[st] && T.qi > 0) { T.qi--; }
+  else if (T.si > 0) { tmStop(); T.si--; const ps = T.steps[T.si]; T.qi = LIST[ps] ? T.picks[ps].length - 1 : 0; if (ps === 'p2') T.p2 = 0; }
+  renderTest();
+}
+
+function renderTest() {
+  const st = T.steps[T.si], el = $('#testView');
+  const prog = T.steps.map(function (s, i) { return '<div class="h-1 flex-1 rounded-full" style="background:' + (i <= T.si ? 'var(--accent-color)' : 'var(--bar-border)') + '"></div>'; }).join('');
+  let body = '', foot = '';
+  const topic = T.card ? T.card.t.replace(/^Describe\s+/i, '') : '';
+  const SCRIPT = {
+    intro: 'Good morning / afternoon. My name is ____. Could you tell me your full name, please?',
+    warm: 'Warm-up chat. This part is not scored; help the student relax.',
+    p1: 'Now, in this first part, I\'d like to ask you some questions about yourself.'
+  };
+  if (LIST[st]) {
+    const list = T.picks[st], q = list[T.qi];
+    const script = st === 'p3' ? 'We\'ve been talking about ' + topic + ' and I\'d like to discuss with you one or two more general questions related to this.' : SCRIPT[st];
+    body = '<div class="text-xs muted italic">' + esc(script) + '</div>' +
+      '<div class="card p-6 min-h-[12rem] flex items-center"><div class="qtext">' + esc(q) + '</div></div>' +
+      '<div class="text-center text-xs muted">Question ' + (T.qi + 1) + ' of ' + list.length + '</div>';
+    foot = '<button class="btn btn-lg" data-act="tBack">' + ic('back', 18) + '</button>' +
+      (st !== 'p3' && st !== 'intro' ? '<button class="btn btn-lg" data-act="tSwap">' + ic('swap', 18) + ' Swap</button>' : '') +
+      '<button class="btn btn-acc btn-lg flex-1" data-act="tNext">' + (T.qi < list.length - 1 ? 'Next question' : 'Continue') + ' ' + ic('next', 18) + '</button>';
+  } else if (st === 'p2') {
+    const c = T.card;
+    const card = '<div class="card p-5 space-y-2" style="border-color:var(--accent-color)"><div class="text-lg font-bold">' + esc(c.t) + '</div><div class="text-xs muted">You should say:</div><ul class="list-disc pl-5 text-sm space-y-1">' + c.b.map(function (b) { return '<li>' + esc(b) + '</li>'; }).join('') + '</ul></div>';
+    let panel = '';
+    const timerBox = function (label) { return '<div class="card p-5 text-center space-y-3"><div class="text-xs font-semibold muted uppercase tracking-widest">' + label + '</div><div id="tmDisp" class="timer-disp">' + fmt(TM.left) + '</div><div class="h-2 rounded-full overflow-hidden" style="background:var(--bar-border)"><div id="tmBar" class="h-full accent-bg" style="width:0%"></div></div>'; };
+    if (T.p2 === 0) {
+      panel = '<div class="text-xs muted italic">Now I\'m going to give you a topic and I\'d like you to talk about it for one to two minutes. Before you talk, you\'ll have one minute to think about what you\'re going to say. You can make some notes if you wish. Here\'s some paper and a pencil for making notes, and here\'s your topic.</div>' + card +
+        '<button class="btn btn-acc btn-lg w-full" data-act="p2Prep">' + ic('play', 18) + ' Start 1-minute preparation</button>';
+    } else if (T.p2 === 1) {
+      panel = card + timerBox('Preparation time — student makes notes') + '<div class="flex gap-2 justify-center"><button class="btn" data-act="tmToggle">' + ic(TM.running ? 'pause' : 'play', 16) + ' ' + (TM.running ? 'Pause' : 'Resume') + '</button><button class="btn" data-act="p2Skip">Skip prep</button></div></div>';
+    } else if (T.p2 === 2) {
+      panel = card + '<div class="card p-4 text-center flash" style="border-color:var(--accent-color)"><div class="font-bold accent-text">Preparation time is up</div><div class="text-xs muted pt-1">All right? Remember, you have one to two minutes for this, so don\'t worry if I stop you. I\'ll tell you when the time is up. Can you start speaking now, please?</div></div>' +
+        '<button class="btn btn-acc btn-lg w-full" data-act="p2Talk">' + ic('play', 18) + ' Start 2-minute talk</button>';
+    } else if (T.p2 === 3) {
+      panel = card + timerBox('Student is speaking') + '<div class="flex gap-2 justify-center"><button class="btn" data-act="tmToggle">' + ic(TM.running ? 'pause' : 'play', 16) + ' ' + (TM.running ? 'Pause' : 'Resume') + '</button><button class="btn" data-act="p2Done">Stop early</button></div></div>';
+    } else {
+      panel = card + '<div class="card p-4 text-center flash" style="border-color:var(--accent-color)"><div class="font-bold accent-text">Time is up</div><div class="text-xs muted pt-1">Thank you. (Optionally ask one rounding-off question about the topic.)</div></div>';
+    }
+    body = panel;
+    foot = '<button class="btn btn-lg" data-act="tBack">' + ic('back', 18) + '</button>' + (T.p2 === 0 ? '<button class="btn btn-lg" data-act="tSwapCard">' + ic('swap', 18) + ' New card</button>' : '') +
+      '<button class="btn ' + (T.p2 === 4 ? 'btn-acc' : '') + ' btn-lg flex-1" data-act="tNext">Part 3 ' + ic('next', 18) + '</button>';
+  } else {
+    const band = calcBand(T.scores);
+    body = '<div class="text-xs muted">Score each criterion (0–9, half bands). Starts at the class target of ' + T.band + '.</div>' +
+      CRIT.map(function (c) { return '<div class="card p-3 flex items-center justify-between"><div class="min-w-0 pr-2"><div class="text-sm font-semibold">' + c[1] + '</div><div class="text-[11px] muted">' + c[2] + '</div></div><div class="flex items-center gap-2"><button class="btn" data-act="sc" data-k="' + c[0] + '" data-d="-0.5" aria-label="Decrease">−</button><div class="w-10 text-center text-lg font-bold">' + T.scores[c[0]].toFixed(1) + '</div><button class="btn" data-act="sc" data-k="' + c[0] + '" data-d="0.5" aria-label="Increase">+</button></div></div>'; }).join('') +
+      '<div class="card p-4 text-center" style="border-color:var(--accent-color)"><div class="text-xs muted">Overall band</div><div class="text-4xl font-extrabold accent-text">' + band.toFixed(1) + '</div><div class="text-sm font-semibold">' + pct(band) + '%</div></div>' +
+      '<textarea id="tNotes" class="inp" rows="3" placeholder="Examiner notes (optional)">' + esc(T.notes) + '</textarea>';
+    foot = '<button class="btn btn-lg" data-act="tBack">' + ic('back', 18) + '</button><button class="btn btn-acc btn-lg flex-1" data-act="saveRes">' + ic('check', 18) + ' Save result</button>';
+  }
+  el.innerHTML = '<div class="border-b bb px-4 pt-3 pb-2 app-header" style="padding-top:calc(.75rem + env(safe-area-inset-top))"><div class="flex items-center justify-between gap-2"><div class="min-w-0"><div class="font-bold text-sm truncate">' + esc(T.name) + '</div><div class="text-[11px] muted truncate">' + esc(T.cname) + ' · ' + esc(T.rlabel) + ' · Band ' + T.band + '</div></div><button class="btn" data-act="tExit" aria-label="Exit test">' + ic('x', 16) + '</button></div><div class="flex gap-1 pt-2">' + prog + '</div><div class="text-[11px] font-semibold accent-text pt-1">' + STEP_LABEL[st] + '</div></div>' +
+    '<div class="flex-1 overflow-y-auto"><div class="max-w-2xl mx-auto w-full p-4 space-y-4">' + body + '</div></div>' +
+    '<div class="border-t bb p-3 flex gap-2 max-w-2xl mx-auto w-full" style="background:var(--nav-bg);max-width:none;padding-bottom:calc(.75rem + env(safe-area-inset-bottom))"><div class="flex gap-2 w-full max-w-2xl mx-auto">' + foot + '</div></div>';
+  if (st === 'p2') tmDraw();
+}
+
+/* ============================== SYNC ============================== */
+function payload(r) {
+  const c = S.classes.find(function (x) { return x.id === r.classId; }), rd = S.rounds.find(function (x) { return x.id === r.roundId; });
+  return { 'class': c ? c.name : 'Class', student: r.studentName, test: rd ? rd.label : 'Test', month: rd ? rd.month : '', date: r.date, target: rd ? rd.band : '', fc: r.scores.fc, lr: r.scores.lr, gra: r.scores.gra, pr: r.scores.pr, band: r.band, percent: r.pct, notes: r.notes || '', warmup: (r.q.warm || r.q.intro || []).join(' | '), part1: (r.q.p1 || []).join(' | '), part2: r.q.card || '', part3: (r.q.p3 || []).join(' | ') };
+}
+let flushing = false;
+async function flush() {
+  if (flushing || !S.settings.webhook || !navigator.onLine) return;
+  flushing = true;
+  try {
+    while (S.queue.length) {
+      const r = S.results.find(function (x) { return x.id === S.queue[0]; });
+      if (r) await fetch(S.settings.webhook, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload(r)) });
+      S.queue.shift(); save();
+    }
+  } catch (e) {}
+  flushing = false;
+}
+function queueIds(ids) { ids.forEach(function (id) { if (S.queue.indexOf(id) < 0) S.queue.push(id); }); save(); flush(); }
+
+/* ============================== ACTIONS ============================== */
+function download(name, text, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: type || 'text/plain' })); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+function csvCell(v) { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+
+const ACT = {
+  tab: function (d) { S.ui.tab = d.v; save(); render(); },
+  toggleClass: function (d) { S.ui.open[d.id] = !S.ui.open[d.id]; save(); render(); },
+  newClass: function () { classModal(); },
+  editClass: function (d) { classModal(d.id); },
+  saveClass: function (d) {
+    const name = $('#cmName').value.trim(); if (!name) { toast('Enter a class name'); return; }
+    const names = parseNames($('#cmNames').value);
+    let c = d.id && S.classes.find(function (x) { return x.id === d.id; });
+    if (!c) { c = { id: uid(), name: name, students: [] }; S.classes.push(c); S.ui.open[c.id] = true; }
+    const old = {}; c.students.forEach(function (s) { old[s.name.toLowerCase()] = s; });
+    c.name = name; c.students = names.map(function (n) { return old[n.toLowerCase()] || { id: uid(), name: n }; });
+    save(); closeSheet(); render(); toast(c.students.length + ' students saved');
+  },
+  delClass: function (d) {
+    if (!confirm('Delete this class and ALL its test results?')) return;
+    S.classes = S.classes.filter(function (c) { return c.id !== d.id; });
+    S.rounds = S.rounds.filter(function (r) { return r.classId !== d.id; });
+    S.results = S.results.filter(function (r) { return r.classId !== d.id; });
+    save(); render();
+  },
+  newRound: function (d) { roundModal(d.id); },
+  saveRound: function (d) {
+    const label = $('#rmLabel').value.trim() || 'Test', band = +$('#rmBand').value, month = $('#rmMonth').value || monthKey();
+    const r = { id: uid(), classId: d.id, label: label, band: band, month: month, created: Date.now() };
+    S.rounds.push(r); S.ui.round[d.id] = r.id; S.settings.lastBand = band; save(); closeSheet(); render();
+  },
+  start: function (d) { startTest(d.sid, d.cid, d.rid); },
+  resToggle: function (d) { S.ui.ropen[d.id] = !S.ui.ropen[d.id]; save(); render(); },
+  delRes: function (d) { if (!confirm('Delete this result?')) return; S.results = S.results.filter(function (r) { return r.id !== d.id; }); save(); render(); },
+  csv: function (d) {
+    const c = S.classes.find(function (x) { return x.id === d.id; }); if (!c) return;
+    const rows = [['Student', 'Test', 'Month', 'Date', 'Target Band', 'Fluency', 'Lexical', 'Grammar', 'Pronunciation', 'Band', 'Percent', 'Notes']];
+    roundsOf(c.id).forEach(function (r) { c.students.forEach(function (s) { const x = resFor(s.id, r.id); if (x) rows.push([s.name, r.label, r.month, x.date, r.band, x.scores.fc, x.scores.lr, x.scores.gra, x.scores.pr, x.band, x.pct, x.notes]); }); });
+    download('IST-' + c.name.replace(/\W+/g, '_') + '-' + today() + '.csv', rows.map(function (r) { return r.map(csvCell).join(','); }).join('\n'), 'text/csv');
+  },
+  syncClass: function (d) {
+    if (!S.settings.webhook) { toast('Add your webhook URL in Settings first'); return; }
+    const ids = S.results.filter(function (r) { return r.classId === d.id; }).map(function (r) { return r.id; });
+    queueIds(ids); toast('Sending ' + ids.length + ' result(s)…');
+  },
+  syncAll: function () {
+    if (!S.settings.webhook) { toast('Paste your webhook URL first'); return; }
+    queueIds(S.results.map(function (r) { return r.id; })); toast('Sending ' + S.results.length + ' result(s)…');
+  },
+  settings: function () { showSettings(); },
+  closeSheet: function () { closeSheet(); },
+  theme: function (d) { setAppTheme(d.v); showSettings(); },
+  accent: function (d) { setAccentColor(d.v); showSettings(); },
+  mode: function (d) { S.settings.mode = d.v; save(); showSettings(); },
+  testSound: function () { ensureAC(); beep(); },
+  copyGas: function () {
+    const done = function () { toast('Script copied'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(GAS).then(done, function () { fallbackCopy(); });
+    else fallbackCopy();
+    function fallbackCopy() { const t = document.createElement('textarea'); t.value = GAS; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); done(); } catch (e) { toast('Copy failed'); } t.remove(); }
+  },
+  exportData: function () { download('ist-assist-backup-' + today() + '.json', JSON.stringify(S), 'application/json'); },
+  resetAll: function () { if (!confirm('Erase ALL classes, results and custom questions on this device?')) return; if (!confirm('Really erase everything? This cannot be undone.')) return; localStorage.removeItem(LS); location.reload(); },
+  bank: function () { showBank(); },
+  bankKind: function (d) { B.kind = d.v; showBank(); },
+  bankBand: function (d) { B.band = +d.v; showBank(); },
+  bankAdd: function () {
+    if (B.kind === 'cards') {
+      const t = $('#bkTopic').value.trim(), b = $('#bkBul').value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean), f = $('#bkFol').value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
+      if (!t || !b.length || !f.length) { toast('Add a topic, prompts and follow-up questions'); return; }
+      (S.custom.cards[B.band] = S.custom.cards[B.band] || []).push(C(t, b, f));
+    } else {
+      const lines = $('#bkText').value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
+      if (!lines.length) { toast('Nothing to add'); return; }
+      if (B.kind === 'p1') { S.custom.p1[B.band] = (S.custom.p1[B.band] || []).concat(lines); }
+      else S.custom[B.kind] = S.custom[B.kind].concat(lines);
+    }
+    save(); showBank(); toast('Added');
+  },
+  bankDel: function (d) {
+    const o = items(B.kind, B.band)[+d.n]; if (!o || o.builtin) return;
+    if (B.kind === 'cards') S.custom.cards[B.band].splice(o.i, 1);
+    else if (B.kind === 'p1') S.custom.p1[B.band].splice(o.i, 1);
+    else S.custom[B.kind].splice(o.i, 1);
+    save(); showBank();
+  },
+  bankHide: function (d) { const o = items(B.kind, B.band)[+d.n]; if (!o) return; if (S.hidden[o.id]) delete S.hidden[o.id]; else S.hidden[o.id] = true; save(); showBank(); },
+
+  /* test */
+  tNext: function () { tNext(); },
+  tBack: function () { tBack(); },
+  tExit: function () { if (confirm('Leave this test? Progress will be lost.')) closeTest(); },
+  tSwap: function () {
+    const st = T.steps[T.si], list = T.picks[st];
+    const kind = st === 'warm' ? 'warm' : 'p1';
+    const pool = active(kind, T.band).filter(function (q) { return list.indexOf(q) < 0; });
+    if (!pool.length) { toast('No other questions available'); return; }
+    list[T.qi] = pool[Math.floor(Math.random() * pool.length)]; renderTest();
+  },
+  tSwapCard: function () {
+    const pool = active('cards', T.band).filter(function (c) { return c.t !== T.card.t; });
+    if (!pool.length) { toast('No other cards available'); return; }
+    T.card = pool[Math.floor(Math.random() * pool.length)]; T.picks.p3 = T.card.f.slice(0, S.settings.nP3); renderTest();
+  },
+  p2Prep: function () { T.p2 = 1; tmStart(60, function () { T.p2 = 2; renderTest(); }); renderTest(); },
+  p2Skip: function () { tmStop(); T.p2 = 2; renderTest(); },
+  p2Talk: function () { T.p2 = 3; tmStart(120, function () { T.p2 = 4; renderTest(); }); renderTest(); },
+  p2Done: function () { tmStop(); T.p2 = 4; renderTest(); },
+  tmToggle: function () {
+    if (TM.running) { TM.left = Math.max(0, Math.ceil((TM.end - Date.now()) / 1000)); tmStop(); }
+    else if (TM.left > 0) { TM.running = true; TM.end = Date.now() + TM.left * 1000; TM.iv = setInterval(tmTick, 200); }
+    renderTest();
+  },
+  sc: function (d) { T.scores[d.k] = Math.max(0, Math.min(9, T.scores[d.k] + parseFloat(d.d))); renderTest(); },
+  saveRes: function () {
+    const band = calcBand(T.scores);
+    const old = resFor(T.sid, T.rid);
+    const rec = { id: old ? old.id : uid(), studentId: T.sid, classId: T.cid, roundId: T.rid, studentName: T.name, scores: { fc: T.scores.fc, lr: T.scores.lr, gra: T.scores.gra, pr: T.scores.pr }, band: band, pct: pct(band), notes: T.notes.trim(), date: today(), q: { warm: T.picks.warm || null, intro: T.picks.intro || null, p1: T.picks.p1 || [], card: T.card ? T.card.t : '', p3: T.picks.p3 || [] } };
+    S.results = S.results.filter(function (r) { return !(r.studentId === T.sid && r.roundId === T.rid); });
+    S.results.push(rec); save(); queueIds([rec.id]);
+    const nm = T.name; closeTest(); toast(nm + ': Band ' + band.toFixed(1) + ' (' + rec.pct + '%) saved');
+  }
+};
+
+const CHG = {
+  round: function (t) { S.ui.round[t.dataset.id] = t.value; save(); render(); },
+  rclass: function (t) { S.ui.rclass = t.value; save(); render(); },
+  cfgnum: function (t) { let v = parseFloat(t.value); if (isNaN(v)) return; const mn = +t.min, mx = +t.max; v = Math.max(mn, Math.min(mx, v)); S.settings[t.dataset.k] = v; save(); },
+  sound: function (t) { S.settings.sound = t.checked; save(); },
+  webhook: function (t) { S.settings.webhook = t.value.trim(); save(); flush(); },
+  importData: function (t) {
+    const f = t.files && t.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = function () {
+      try { const j = JSON.parse(r.result); if (!j.classes || !j.settings) throw 0; if (!confirm('Replace current data with this backup?')) return; localStorage.setItem(LS, JSON.stringify(j)); location.reload(); }
+      catch (e) { toast('Not a valid IST Assist backup'); }
+    };
+    r.readAsText(f);
+  }
+};
+
+document.addEventListener('click', function (e) {
+  if (e.target.id === 'sheet') { closeSheet(); return; }
+  const b = e.target.closest('[data-act]');
+  if (b && ACT[b.dataset.act]) ACT[b.dataset.act](b.dataset, b, e);
+});
+document.addEventListener('change', function (e) { const t = e.target.closest('[data-chg]'); if (t && CHG[t.dataset.chg]) CHG[t.dataset.chg](t); });
+document.addEventListener('input', function (e) { if (e.target.id === 'tNotes' && T) T.notes = e.target.value; });
+window.addEventListener('online', flush);
+document.addEventListener('visibilitychange', function () { if (T && document.visibilityState === 'visible') wake(); });
+
+/* ============================== INIT ============================== */
+window.addEventListener('DOMContentLoaded', function () {
+  setAccentColor(S.settings.accent);
+  setAppTheme(S.settings.theme);
+  hydrate(); fixImgs(); render(); flush();
+  if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) navigator.serviceWorker.register('sw.js').catch(function () {});
+});
+</script>
+</body>
+</html>
