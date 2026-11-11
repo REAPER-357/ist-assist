@@ -238,7 +238,7 @@ function defaults() {
     classes: [], rounds: [], results: [], queue: [], hidden: {}, used: {},
     custom: { warm: [], intro: [], p1: {}, cards: {} },
     ui: { tab: 'classes', open: {}, round: {}, rclass: '', ropen: {} },
-    settings: { theme: 'black', accent: '#10b981', mode: 'own', nWarm: 3, nP1: 4, nP3: 4, sound: true, fullBand: 9, webhook: '', lastBand: 6, pin: '' }
+    settings: { theme: 'black', accent: '#10b981', mode: 'own', nWarm: 3, nP1: 4, nP3: 4, sound: true, fullBand: 9, webhook: '', lastBand: 6, pin: '', rec: '' }
   };
 }
 let S = defaults();
@@ -475,7 +475,7 @@ function showSettings() {
     [['black', 'Pure Black'], ['dark', 'Dark'], ['light', 'Light']].map(function (t) { return '<button class="btn ' + (s.theme === t[0] ? 'btn-acc' : '') + '" data-act="theme" data-v="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>' +
     '<div class="flex items-center justify-around pt-1">' + acc.map(function (a) { return '<button aria-label="' + a[1] + ' accent" data-act="accent" data-v="' + a[0] + '" class="w-8 h-8 rounded-full" style="background:' + a[0] + ';outline:' + (s.accent === a[0] ? '2px solid var(--page-fg)' : 'none') + ';outline-offset:2px"></button>'; }).join('') + '</div></div>' +
 
-    '<div class="space-y-2"><span class="text-xs font-semibold muted">EXAMINER PIN</span><div class="text-[11px] muted">' + (s.pin ? 'A PIN is set.' : 'No PIN set.') + ' It is asked when entering Examiner mode and when leaving Student view. It keeps curious students out; it is not encryption.</div><div class="flex gap-2"><input id="pinNew" type="password" inputmode="numeric" maxlength="8" class="inp" placeholder="New PIN (4-8 digits)"><button class="btn btn-acc" data-act="setPin">Save</button>' + (s.pin ? '<button class="btn btn-danger" data-act="clearPin">Remove</button>' : '') + '</div></div>' +
+    '<div class="space-y-2"><span class="text-xs font-semibold muted">EXAMINER PIN</span><div class="text-[11px] muted">PIN is set' + (s.rec ? ', recovery code saved' : ', but no recovery code yet') + '. It is asked when entering Examiner mode and when leaving Student view. It keeps curious students out; it is not encryption.</div><div class="flex gap-2"><input id="pinNew" type="password" inputmode="numeric" maxlength="8" class="inp" placeholder="New PIN (4-8 digits)"><button class="btn btn-acc" data-act="setPin">Change</button></div><button class="btn w-full" data-act="newRec">' + ic('lock', 14) + ' Make a new recovery code</button></div>' +
     '<div class="space-y-2"><span class="text-xs font-semibold muted">TEST TYPE</span>' +
     '<button class="card w-full p-3 text-left ' + (s.mode === 'own' ? 'accent-border' : '') + '" style="' + (s.mode === 'own' ? 'border-color:var(--accent-color)' : '') + '" data-act="mode" data-v="own"><div class="text-sm font-semibold">My own students</div><div class="text-[11px] muted">Friendly warm-up questions (How are you today?). No ID or name questions.</div></button>' +
     '<button class="card w-full p-3 text-left" style="' + (s.mode === 'outside' ? 'border-color:var(--accent-color)' : '') + '" data-act="mode" data-v="outside"><div class="text-sm font-semibold">Outside examiner</div><div class="text-[11px] muted">Starts with name, ID check, where you live, work or study.</div></button></div>' +
@@ -667,7 +667,33 @@ const ACT = {
     if (!/^\d{4,8}$/.test(v)) { toast('PIN must be 4-8 digits'); return; }
     S.settings.pin = hashPin(v); save(); showSettings(); toast('PIN saved');
   },
-  clearPin: function () { S.settings.pin = ''; save(); showSettings(); toast('PIN removed'); },
+  pinCreate: function (d) {
+    const a = ($('#pinA').value || '').trim(), b = ($('#pinB').value || '').trim(), err = $('#pinErr');
+    if (!/^\d{4,8}$/.test(a)) { err.textContent = 'PIN must be 4-8 digits'; return; }
+    if (a !== b) { err.textContent = 'The two PINs do not match'; return; }
+    if (!$('#pinSaved').checked) { err.textContent = 'Tick the box once you have written down the recovery code'; return; }
+    S.settings.pin = hashPin(a); S.settings.rec = hashPin(normRec(d.rec)); save();
+    closePin(); toast('PIN saved');
+    const f = PINCB; PINCB = null; if (f) f();
+  },
+  pinForgot: function () {
+    $('#pinBox').innerHTML = '<div class="card w-full max-w-xs p-5 space-y-3 text-center"><div class="font-bold">Reset PIN</div><div class="text-[11px] muted">Enter your recovery code and choose a new PIN.</div><input id="rcIn" autocomplete="off" class="inp text-center font-mono" placeholder="RECOVERY CODE"><input id="pinA" type="password" inputmode="numeric" autocomplete="off" maxlength="8" class="inp text-center" placeholder="New PIN (4-8 digits)"><input id="pinB" type="password" inputmode="numeric" autocomplete="off" maxlength="8" class="inp text-center" placeholder="Repeat PIN"><div id="pinErr" class="text-xs" style="color:#f87171;min-height:1rem"></div><div class="flex gap-2"><button class="btn flex-1" data-act="pinCancel">Cancel</button><button class="btn btn-acc flex-1" data-act="pinReset">Reset</button></div></div>';
+  },
+  pinReset: function () {
+    const err = $('#pinErr'), a = ($('#pinA').value || '').trim(), b = ($('#pinB').value || '').trim();
+    if (!S.settings.rec) { err.textContent = 'No recovery code was saved on this device'; return; }
+    if (hashPin(normRec($('#rcIn').value)) !== S.settings.rec) { err.textContent = 'Recovery code is not correct'; return; }
+    if (!/^\d{4,8}$/.test(a)) { err.textContent = 'PIN must be 4-8 digits'; return; }
+    if (a !== b) { err.textContent = 'The two PINs do not match'; return; }
+    S.settings.pin = hashPin(a); save(); closePin(); toast('PIN reset');
+    const f = PINCB; PINCB = null; if (f) f();
+  },
+  newRec: function () {
+    const rec = genRec(); S.settings.rec = hashPin(normRec(rec)); save(); showSettings();
+    const el = $('#pinBox');
+    el.innerHTML = '<div class="card w-full max-w-xs p-5 space-y-3 text-center"><div class="font-bold">Your new recovery code</div><div class="font-mono text-xl font-bold accent-text" style="letter-spacing:.15em">' + rec + '</div><div class="text-[11px] muted">Write it down now. It will not be shown again, and any older code no longer works.</div><button class="btn btn-acc w-full" data-act="pinCancel">I have written it down</button></div>';
+    el.classList.remove('hidden');
+  },
   tab: function (d) { S.ui.tab = d.v; save(); render(); },
   toggleClass: function (d) { S.ui.open[d.id] = !S.ui.open[d.id]; save(); render(); },
   newClass: function () { classModal(); },
@@ -820,12 +846,25 @@ function hashPin(p) { let h = 2166136261; const s = 'ist|' + p; for (let i = 0; 
 let PINCB = null;
 function closePin() { const el = $('#pinBox'); el.classList.add('hidden'); el.innerHTML = ''; }
 function askPin(cb, title) {
-  if (!S.settings.pin) { cb(); return; }
+  if (!S.settings.pin) { showPinSetup(cb); return; }
   PINCB = cb;
   const el = $('#pinBox');
-  el.innerHTML = '<div class="card w-full max-w-xs p-5 space-y-3 text-center"><div class="accent-text flex justify-center">' + ic('lock', 30) + '</div><div class="font-bold">' + esc(title || 'Examiner PIN') + '</div><input id="pinInp" type="password" inputmode="numeric" autocomplete="off" maxlength="8" class="inp text-center text-lg" style="letter-spacing:.4em" placeholder="PIN"><div id="pinErr" class="text-xs h-4" style="color:#f87171"></div><div class="flex gap-2"><button class="btn flex-1" data-act="pinCancel">Cancel</button><button class="btn btn-acc flex-1" data-act="pinOk">Unlock</button></div></div>';
+  el.innerHTML = '<div class="card w-full max-w-xs p-5 space-y-3 text-center"><div class="accent-text flex justify-center">' + ic('lock', 30) + '</div><div class="font-bold">' + esc(title || 'Examiner PIN') + '</div><input id="pinInp" type="password" inputmode="numeric" autocomplete="off" maxlength="8" class="inp text-center text-lg" style="letter-spacing:.4em" placeholder="PIN"><div id="pinErr" class="text-xs h-4" style="color:#f87171"></div><div class="flex gap-2"><button class="btn flex-1" data-act="pinCancel">Cancel</button><button class="btn btn-acc flex-1" data-act="pinOk">Unlock</button></div><button class="text-xs muted underline" data-act="pinForgot">Forgot PIN?</button></div>';
   el.classList.remove('hidden');
   setTimeout(function () { const i = $('#pinInp'); if (i) i.focus(); }, 60);
+}
+function normRec(x) { return String(x || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
+function genRec() {
+  const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', b = new Uint8Array(10);
+  try { crypto.getRandomValues(b); } catch (e) { for (let i = 0; i < 10; i++) b[i] = Math.floor(Math.random() * 256); }
+  let r = ''; for (let i = 0; i < 10; i++) r += a[b[i] % a.length];
+  return r.slice(0, 5) + '-' + r.slice(5);
+}
+function showPinSetup(cb) {
+  PINCB = cb;
+  const rec = genRec(), el = $('#pinBox');
+  el.innerHTML = '<div class="card w-full max-w-xs p-5 space-y-3 text-center max-h-[92vh] overflow-y-auto"><div class="accent-text flex justify-center">' + ic('lock', 30) + '</div><div class="font-bold">Set an Examiner PIN</div><div class="text-[11px] muted">This keeps students out of your classes, scores and question bank.</div><input id="pinA" type="password" inputmode="numeric" autocomplete="off" maxlength="8" class="inp text-center" placeholder="New PIN (4-8 digits)"><input id="pinB" type="password" inputmode="numeric" autocomplete="off" maxlength="8" class="inp text-center" placeholder="Repeat PIN"><div class="card p-3 space-y-1"><div class="text-[11px] muted">Recovery code. Write it down: it is the only way to reset a forgotten PIN.</div><div class="font-mono text-lg font-bold accent-text" style="letter-spacing:.15em">' + rec + '</div></div><label class="flex items-center gap-2 text-xs text-left"><input type="checkbox" id="pinSaved"> I have written down my recovery code</label><div id="pinErr" class="text-xs" style="color:#f87171;min-height:1rem"></div><div class="flex gap-2"><button class="btn flex-1" data-act="pinCancel">Cancel</button><button class="btn btn-acc flex-1" data-act="pinCreate" data-rec="' + rec + '">Save</button></div></div>';
+  el.classList.remove('hidden');
 }
 function hideLanding() { const el = $('#landing'); el.classList.add('hidden'); el.innerHTML = ''; }
 function showLanding(student) {
